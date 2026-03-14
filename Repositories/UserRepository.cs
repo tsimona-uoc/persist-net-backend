@@ -13,6 +13,11 @@ namespace persist_net_backend.Repositories
             _context = context;
         }
 
+        public async Task<User?> findById(Guid id)
+        {
+            return await _context.Users.FindAsync(id);
+        }
+
         public async Task<User?> findByEmail(string email)
         {
             return await _context.Users.FirstOrDefaultAsync(x => x.Email == email);

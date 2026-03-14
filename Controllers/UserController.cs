@@ -6,7 +6,7 @@ namespace persist_net_backend.Controllers
 {
 
     [ApiController]
-    [Route("api/[controller]")] // https://localhost:PORT/api/products
+    [Route("api/[controller]")]
     public class UserController : ControllerBase
     {
         private readonly IAuthService _authService;
@@ -31,13 +31,13 @@ namespace persist_net_backend.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterRequest request)
         {
-            var (success, token) = await _authService.RegisterAsync(request.Name, request.Surname, request.Email, request.Password );
+            var success = await _authService.RegisterAsync(request.Name, request.Surname, request.Email, request.Password );
             if (!success)
             {
                 return BadRequest();
             }
 
-            return Ok(new { Token = token });
+            return Ok();
         }
     }
 }
