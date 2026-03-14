@@ -41,11 +41,13 @@ public class Program {
 
         #endregion
 
+        builder.Services.AddScoped<IUserSessionRepository, UserSessionRepository>();
         builder.Services.AddScoped<IUserRepository, UserRepository>();
     }
 
     public static void RegisterServices(WebApplicationBuilder builder)
     {
+        builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
         builder.Services.AddScoped<IAuthService, AuthService>();
     }
 

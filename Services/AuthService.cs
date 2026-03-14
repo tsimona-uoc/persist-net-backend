@@ -1,3 +1,4 @@
+using persist_net_backend.Models;
 using persist_net_backend.Repositories;
 using System.Security.Cryptography;
 using System.Text;
@@ -7,10 +8,12 @@ namespace persist_net_backend.Services
     public class AuthService : IAuthService
     {
         private readonly IUserRepository _userRepository;
+        private readonly IJwtTokenService _jwtTokenService;
 
-        public AuthService(IUserRepository userRepository)
+        public AuthService(IUserRepository userRepository, IJwtTokenService jwtTokenService)
         {
             this._userRepository = userRepository;
+            this._jwtTokenService = jwtTokenService;
         }
 
         
@@ -37,9 +40,9 @@ namespace persist_net_backend.Services
             // Comparar el hash del password con el almacenado en la base de datos
             if (hashedPassword == user.PasswordHash)
             {
-                // El password es correcto
-                // TODO: Generar y retornar un token JWT
-                return (true, string.Empty);
+                // Actualizar la sesión del usuario en BBDD
+                UserSession result = await this._jwtTokenService.UpdateUserSession(user.Id);
+                return (true, result.JwtToken);
             }
             
             return (false, string.Empty);
@@ -53,13 +56,13 @@ namespace persist_net_backend.Services
         /// <param name="surname">El apellido del usuario</param>
         /// <param name="email">El email del usuario</param>
         /// <param name="password">El password del usuario</param>
-        /// <returns>Un tuple indicando si el registro fue exitoso y un token JWT (vacío si no fue exitoso)</returns>
-        public Task<(bool success, string token)> RegisterAsync(string name, string surname, string email, string password){
+        /// <
+        public Task<bool> RegisterAsync(string name, string surname, string email, string password){
             // Verificar si el email ya está registrado
             var existingUser = _userRepository.findByEmail(email).Result;
             if (existingUser != null)
             {
-                return Task.FromResult((false, string.Empty));
+                return Task.FromResult(false);
             }
 
             // Calcular el hash SHA-256 del password
@@ -78,7 +81,7 @@ namespace persist_net_backend.Services
 
             // Guardar el usuario en la base de datos
             _userRepository.Add(newUser);
-            return Task.FromResult((true, string.Empty));
+            return Task.FromResult(true);
         }
         
         /// <summary>
