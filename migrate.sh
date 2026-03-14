@@ -13,7 +13,7 @@ TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 MIGRATION_NAME="${1}_${TIMESTAMP}"
 
 echo "📝 Creando migración: $MIGRATION_NAME"
-dotnet ef migrations add "$MIGRATION_NAME"
+dotnet ef migrations add "$MIGRATION_NAME" --output-dir Data/Migrations
 
 if [ $? -eq 0 ]; then
     echo "✅ Migración creada. Iníciá la app para aplicarla:"

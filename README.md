@@ -29,17 +29,23 @@ cd persist-net-backend
 
 ### 2. Configurar variables de entorno
 
-Crea un archivo `.env` en la raíz del proyecto:
+Crea un archivo `.env` en la raíz del proyecto (o copia el template):
 
 ```bash
 cp .env.example .env
 ```
 
-Edita `.env` y añade tu connection string:
+Edita `.env` y configura tu connection string de SQL Server:
 
 ```
-CONNECTION_STRING=Server=<your-server>;Initial Catalog=<your-db>;User ID=<user>;Password=<password>;...
+CONNECTION_STRING=Server=localhost;Initial Catalog=persist_db;User ID=sa;Password=YourPassword;TrustServerCertificate=true;Encrypt=false;
 ```
+
+Ajusta los valores según tu servidor SQL Server:
+- `Server`: Host del servidor (ej: `localhost`, `127.0.0.1`, `persistnet.database.windows.net`)
+- `Initial Catalog`: Nombre de la base de datos (se creará automáticamente si no existe)
+- `User ID`: Usuario de SQL Server
+- `Password`: Contraseña
 
 > **Nota:** El archivo `.env` está excluido de git para proteger credenciales sensibles.
 
@@ -49,14 +55,17 @@ CONNECTION_STRING=Server=<your-server>;Initial Catalog=<your-db>;User ID=<user>;
 dotnet restore
 ```
 
-### 4. Ejecutar migraciones
+### 4. Ejecutar la aplicación
 
-Las migraciones se ejecutan automáticamente al iniciar la aplicación. Si necesitas crearlas manualmente:
+Las migraciones se ejecutan **automáticamente** al iniciar la aplicación:
 
 ```bash
-dotnet ef migrations add <migration-name>
-dotnet ef database update
+dotnet run
 ```
+
+La base de datos se creará y todas las migraciones se aplicarán automáticamente. ✨
+
+> **Nota:** Solo necesitas tener la `CONNECTION_STRING` correcta en el archivo `.env`
 
 ## Estructura del Proyecto
 
@@ -84,16 +93,20 @@ dotnet run
 
 La API estará disponible en `https://localhost:5001` (o el puerto configurado).
 
-### Crear migraciones
+**Las migraciones se aplican automáticamente** durante el startup. No necesitas hacer nada extra.
 
-```bash
-dotnet run --migrate
+### Crear nuevas migraciones (desarrollo)
+
+Usa los scripts incluidos:
+
+**Windows:**
+```powershell
+.\migrate-windows.ps1 -MigrationName "AddCategory"
 ```
 
-O usar el script incluido:
-
+**Linux/macOS:**
 ```bash
-bash migrate.sh "<migration-name>"
+./migrate.sh AddCategory
 ```
 
 ## Modelos Principales
