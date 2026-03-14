@@ -1,0 +1,6 @@
+@persist_net_backend_HostAddress = http://localhost:5156
+
+GET {{persist_net_backend_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
