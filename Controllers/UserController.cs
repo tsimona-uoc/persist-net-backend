@@ -22,7 +22,8 @@ namespace persist_net_backend.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
-            var (success, token) = await _authService.LoginAsync(request.Email, request.Password);
+            var address = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
+            var (success, token) = await _authService.LoginAsync(request.Email, request.Password, address);
             if (!success)
             {
                 return Unauthorized();

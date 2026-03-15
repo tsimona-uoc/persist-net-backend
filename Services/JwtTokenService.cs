@@ -116,8 +116,9 @@ namespace persist_net_backend.Services
         /// </summary>
         /// <param name="userId">El ID del usuario</param>
         /// <param name="token">El nuevo token JWT</param>
+        /// <param name="address">La dirección IP del usuario</param>
         /// <returns>La sesión actualizada del usuario</returns>
-        public async Task<UserSession> UpdateUserSession(Guid userId)
+        public async Task<UserSession> UpdateUserSession(Guid userId, string address)
         {
             var user = await this._userRepository.findById(userId); // Verificar que el usuario existe antes de actualizar la sesión
 
@@ -127,7 +128,7 @@ namespace persist_net_backend.Services
             }
 
             string token = GenerateToken(userId, user.Email);
-            var userSession = await _userSessionRepository.UpdateSessionAsync(userId, token);
+            var userSession = await _userSessionRepository.UpdateSessionAsync(userId, token, address);
             return userSession;
         }
     }

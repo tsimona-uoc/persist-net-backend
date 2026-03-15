@@ -25,8 +25,9 @@ namespace persist_net_backend.Services
         /// </summary>
         /// <param name="email">El email del usuario</param>
         /// <param name="password">El password del usuario</param>
+        /// <param name="address">La dirección IP del usuario</param>
         /// <returns>Un tuple indicando si la autenticación fue exitosa y un token JWT (vacío si no fue exitosa)</returns>
-        public async Task<(bool success, string token)> LoginAsync(string email, string password)
+        public async Task<(bool success, string token)> LoginAsync(string email, string password, string address)
         {
             // Buscar el usuario por email
             var user = await _userRepository.findByEmail(email);
@@ -43,7 +44,7 @@ namespace persist_net_backend.Services
             if (hashedPassword == user.PasswordHash)
             {
                 // Actualizar la sesión del usuario en BBDD
-                UserSession result = await this._jwtTokenService.UpdateUserSession(user.Id);
+                UserSession result = await this._jwtTokenService.UpdateUserSession(user.Id, address);
                 return (true, result.Token);
             }
             

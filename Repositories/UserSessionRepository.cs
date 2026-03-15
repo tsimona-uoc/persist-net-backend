@@ -14,7 +14,7 @@ namespace persist_net_backend.Repositories
             _context = context;
         }
 
-        public async Task<UserSession> UpdateSessionAsync(Guid userId, string token)
+        public async Task<UserSession> UpdateSessionAsync(Guid userId, string token, string address)
         {
             // Decodificar JWT para obtener la fecha de expiración real
             var handler = new JwtSecurityTokenHandler();
@@ -48,7 +48,7 @@ namespace persist_net_backend.Repositories
                     Token = token,
                     CreatedAt = DateTime.Now,
                     ExpiresAt = expiresAt,
-                    IpAddress = string.Empty,
+                    IpAddress = address,
                     LastModifiedBy = "system",
                     LastModifiedAt = DateTime.Now
                 };
@@ -59,6 +59,7 @@ namespace persist_net_backend.Repositories
                 session.Token = token;
                 session.CreatedAt = DateTime.Now;
                 session.ExpiresAt = expiresAt;
+                session.IpAddress = address;
                 session.LastModifiedBy = "system";
                 session.LastModifiedAt = DateTime.Now;
                 _context.UserSessions.Update(session);

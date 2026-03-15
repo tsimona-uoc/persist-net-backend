@@ -31,7 +31,8 @@ namespace persist_net_backend.Services
         /// Actualiza la sesión del usuario con el nuevo token JWT
         /// </summary>
         /// <param name="userId">El ID del usuario</param>
+        /// <param name="address">La dirección IP del usuario</param>
         /// <returns>La sesión actualizada del usuario</returns>
-        Task<UserSession> UpdateUserSession(Guid userId);
+        Task<UserSession> UpdateUserSession(Guid userId, string address);
     }
 }

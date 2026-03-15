@@ -4,6 +4,6 @@ namespace persist_net_backend.Repositories
 {
     public interface IUserSessionRepository
     {
-        public Task<UserSession> UpdateSessionAsync(Guid userId, string token);
+        public Task<UserSession> UpdateSessionAsync(Guid userId, string token, string address);
     }
 }
