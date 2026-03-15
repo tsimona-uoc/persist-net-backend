@@ -70,6 +70,9 @@ public class Program {
         builder.Services.AddScoped<IPagoRepository, PagoRepository>();
         builder.Services.AddScoped<IMetodoPagoRepository, MetodoPagoRepository>();
         builder.Services.AddScoped<IRegimenRepository, RegimenRepository>();
+
+        // Export Repository
+        builder.Services.AddScoped<IExportRepository, ExportRepository>();
     }
 
     public static void RegisterServices(WebApplicationBuilder builder)
@@ -99,6 +102,9 @@ public class Program {
         builder.Services.AddScoped<IPagoService, PagoService>();
         builder.Services.AddScoped<IMetodoPagoService, MetodoPagoService>();
         builder.Services.AddScoped<IRegimenService, RegimenService>();
+
+        // Export Service
+        builder.Services.AddScoped<IExportService, ExportService>();
     }
 
     public static void RegisterAuthentication(WebApplicationBuilder builder)
