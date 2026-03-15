@@ -1,118 +1,146 @@
-# Persist Net Backend
+# Persist.NET Backend - Sistema de Gestión Hotelera
 
-Backend para la aplicación Persist construido con ASP.NET Core 9.0 y Entity Framework Core, utilizando SQL Server como base de datos.
+API REST completa para la gestión integral de un sistema hotelero, construido con **ASP.NET Core 10.0** y **Entity Framework Core 9.0**, utilizando **SQL Server** como base de datos.
 
-## Descripción
+## 📋 Descripción
 
-Este proyecto proporciona una API REST para la gestión de usuarios y autenticación con las siguientes características:
+Sistema horizontal completo para gestión de hoteles con:
 
-- 🔐 **Autenticación segura** con hash SHA-256 de contraseñas
-- 👤 **Gestión de usuarios** (User)
-- 📋 **Sesiones de usuario** (UserSession)
-- 🗄️ **Base de datos relacional** con Entity Framework Core
-- 🔄 **Migraciones automáticas** de Entity Framework
+- 🔐 **Autenticación JWT** con Bearer token (JwtBearer)
+- 🏨 **13 Controladores CRUD** para todas las entidades hoteleras
+- 👤 **Gestión de usuarios** con roles (ADMIN, USER, etc.)
+- 📍 **Sesiones con seguimiento de IP** y fecha de expiración real
+- 🛡️ **Autorización granular** - Solo login es público, register requiere token
+- 📚 **Arquitectura 3 capas**: Controllers → Services → Repositories → DbContext
+- ⚙️ **14 Repositorios** + **14 Servicios** para acceso y lógica de datos
+- 🗄️ **Migraciones automáticas** al iniciar la aplicación
+- 📮 **Colección de Postman** lista con todos los endpoints
 
-## Requisitos
+## 🎯 Características Principales
 
-- .NET 9.0 SDK o superior
-- SQL Server 2019 o superior
-- macOS, Windows o Linux
+### Entidades Hoteleras
+- **Hoteles**: Gestión completa de propiedades hoteleras
+- **Habitaciones**: Rooms con tipos y estados
+- **Reservas**: Bookings de clientes con fechas
+- **Clientes**: Información de huéspedes
+- **Tarifas**: Pricing dinámico por temporada, tipo y régimen
+- **Temporadas**: Períodos de precios especiales
+- **Facturas**: Invoices con seguimiento de pagos
+- **Pagos**: Métodos de pago y transacciones
+- **Servicios Extra**: Amenities adicionales (spa, etc.)
+- **Estancias**: Registro de ocupación real
+- **Regímenes**: Planes de comida (AD, MP, PC, TI)
+- **Métodos de Pago**: Tarjeta, efectivo, transferencia, etc.
 
-## Instalación
+### Autenticación
+- User Registration (público - sin token)
+- User Login (público - sin token, retorna JWT)
+- Sessions automáticas con IP y expiración real
+- Token JWT con expiración configurable
 
-### 1. Clonar el repositorio
+## 📋 Requisitos
+
+- **.NET 10.0 SDK** o superior
+- **SQL Server 2019** o superior
+- **Visual Studio Code** o **Visual Studio 2022**
+- **Postman** (opcional, para testing)
+
+## 🚀 Inicio Rápido
+
+### 1. Clonar Repositorio
 
 ```bash
 git clone <repository-url>
 cd persist-net-backend
 ```
 
-### 2. Configurar variables de entorno
+### 2. Configurar Base de Datos
 
-Crea un archivo `.env` en la raíz del proyecto (o copia el template):
+Edita `appsettings.json` y configura tu connection string:
 
-```bash
-cp .env.example .env
+```json
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "Server=localhost;Initial Catalog=persist_db;User ID=sa;Password=YourPassword;TrustServerCertificate=true;Encrypt=false;"
+  },
+  "Jwt": {
+    "SecretKey": "your-super-secret-key-with-min-32-chars-length",
+    "Issuer": "persist-net-backend",
+    "Audience": "persist-net-users",
+    "ExpirationMinutes": 60
+  }
+}
 ```
 
-Edita `.env` y configura tu connection string de SQL Server:
+**O usa variables de entorno:**
 
+```powershell
+$env:ConnectionStrings__DefaultConnection = "Server=localhost;..."
+$env:JWT_SECRET_KEY = "your-super-secret-key-min-32-chars"
+$env:JWT_ISSUER = "persist-net-backend"
+$env:JWT_AUDIENCE = "persist-net-users"
+$env:JWT_EXPIRATION_MINUTES = "60"
 ```
-CONNECTION_STRING=Server=localhost;Initial Catalog=persist_db;User ID=sa;Password=YourPassword;TrustServerCertificate=true;Encrypt=false;
-```
 
-Ajusta los valores según tu servidor SQL Server:
-- `Server`: Host del servidor (ej: `localhost`, `127.0.0.1`, `persistnet.database.windows.net`)
-- `Initial Catalog`: Nombre de la base de datos (se creará automáticamente si no existe)
-- `User ID`: Usuario de SQL Server
-- `Password`: Contraseña
-
-> **Nota:** El archivo `.env` está excluido de git para proteger credenciales sensibles.
-
-### 3. Restaurar dependencias
+### 3. Restaurar Dependencias
 
 ```bash
 dotnet restore
 ```
 
-### 4. Ejecutar la aplicación
+### 4. Ejecutar la Aplicación
 
-Las migraciones se ejecutan **automáticamente** al iniciar la aplicación:
+Las migraciones se aplican **automáticamente** al iniciar:
 
 ```bash
 dotnet run
 ```
 
-La base de datos se creará y todas las migraciones se aplicarán automáticamente. ✨
+✅ **API disponible en**: `https://0.0.0.0:7151` (escucha en todos los interfaces)
 
-> **Nota:** Solo necesitas tener la `CONNECTION_STRING` correcta en el archivo `.env`
+#### Acceso Local vs Remoto
 
-## Estructura del Proyecto
+**Desde la misma máquina:**
+```
+https://localhost:7151/api
+```
+
+**Desde otra máquina en la red:**
+```
+https://192.168.x.x:7151/api
+```
+
+Obtén tu IP local con:
+```powershell
+ipconfig  # Windows
+ifconfig  # Linux/Mac
+```
+
+## 📁 Estructura del Proyecto
 
 ```
 persist-net-backend/
-├── Controllers/          # Controladores de la API
-├── Data/                 # DbContext y migraciones
-├── DTOs/                 # Data Transfer Objects
-├── Models/               # Modelos de entidad (User, UserSession)
-├── Repositories/         # Capa de acceso a datos
-├── Services/             # Lógica de negocio (AuthService)
-├── Program.cs            # Configuración de la aplicación
-├── appsettings.json      # Configuración por defecto
-├── .env                  # Variables de entorno (no subir a git)
-└── persist-net-backend.sln
+├── Controllers/              # 13 controladores CRUD + UserController
+├── Data/
+│   ├── AppDbContext.cs       # DbContext con 19+ DbSets
+│   └── Migrations/           # EF Core migrations
+├── DTOs/                     # LoginRequest, RegisterRequest
+├── Models/                   # 19 modelos de entidad
+├── Repositories/             # 14 interfaces + 14 implementaciones
+├── Services/                 # 14 interfaces + 14 implementaciones + JwtTokenService, AuthService
+├── Properties/
+│   └── launchSettings.json   # Escucha en 0.0.0.0:7151
+├── Postman/                  # Colección y environment JSON + README
+├── Program.cs                # DI, Autenticación, Migraciones automáticas
+├── appsettings.json          # Configuración por defecto
+├── appsettings.Development.json
+├── persist-net-backend.csproj
+└── README.md
 ```
 
-## Uso
+## 📚 Modelos de Datos
 
-### Ejecutar la aplicación
-
-```bash
-dotnet run
-```
-
-La API estará disponible en `https://localhost:5001` (o el puerto configurado).
-
-**Las migraciones se aplican automáticamente** durante el startup. No necesitas hacer nada extra.
-
-### Crear nuevas migraciones (desarrollo)
-
-Usa los scripts incluidos:
-
-**Windows:**
-```powershell
-.\migrate-windows.ps1 -MigrationName "AddCategory"
-```
-
-**Linux/macOS:**
-```bash
-./migrate.sh AddCategory
-```
-
-## Modelos Principales
-
-### User
-
+### User (Identity)
 ```csharp
 public class User
 {
@@ -121,113 +149,295 @@ public class User
     public string Surname { get; set; }
     public string Email { get; set; }
     public string PasswordHash { get; set; }  // SHA-256
-    public string LastModifiedBy { get; set; }
+    public UserRole Role { get; set; }
+    public DateTime CreatedAt { get; set; }
     public DateTime LastModifiedAt { get; set; }
     public ICollection<UserSession> Sessions { get; set; }
 }
 ```
 
 ### UserSession
-
 ```csharp
 public class UserSession
 {
     public Guid Id { get; set; }
     public Guid UserId { get; set; }
     public User User { get; set; }
-    public string JwtToken { get; set; }
-    public string LastModifiedBy { get; set; }
+    public string Token { get; set; }          // JWT actual
+    public DateTime CreatedAt { get; set; }
+    public DateTime ExpiresAt { get; set; }    // Expiración real del JWT
+    public string IpAddress { get; set; }      // IP del cliente
     public DateTime LastModifiedAt { get; set; }
+    public string LastModifiedBy { get; set; }
 }
 ```
 
-## Servicios
-
-### AuthService
-
-Proporciona funcionalidad de autenticación:
-
-- **LoginAsync(email, password)**: Autentica un usuario validando credenciales con SHA-256
-
+### Hotel
 ```csharp
-var (success, token) = await authService.LoginAsync("user@example.com", "password");
-```
-
-## Endpoints
-
-### POST `/api/user/login`
-
-Autentica un usuario y retorna un JWT token.
-
-**Request:**
-```json
+public class Hotel
 {
-  "email": "user@example.com",
-  "password": "password123"
+    public int Id { get; set; }
+    public string Name { get; set; }
+    public string Description { get; set; }
+    public string Address { get; set; }
+    public string Phone { get; set; }
+    public string Email { get; set; }
+    // Relaciones...
 }
 ```
 
-**Response (2xx):**
-```json
+### Reserva
+```csharp
+public class Reserva
 {
-  "success": true,
-  "token": "eyJhbGciOiJIUzI1NiIs..."
+    public int Id { get; set; }
+    public int ClienteId { get; set; }
+    public int HabitacionId { get; set; }
+    public DateTime FechaEntrada { get; set; }
+    public DateTime FechaSalida { get; set; }
+    public EstadoReserva Estado { get; set; }
+    // Relaciones...
 }
 ```
 
-## Seguridad
+*Ver Models/ para más entidades*
 
-- Las contraseñas se almacenan como **hash SHA-256** (no en texto plano)
-- Las credenciales sensibles se gestionan mediante variables de entorno (`.env`)
-- Entity Framework previene SQL Injection mediante consultas parametrizadas
-- Se utiliza HTTPS en producción
+## 🔐 Autenticación & Autorización
 
-## Variables de Entorno
+### Flujo de Autenticación
 
-| Variable | Descripción | Ejemplo |
-|----------|-------------|---------|
-| `CONNECTION_STRING` | Cadena de conexión a SQL Server | `Server=...;Password=...` |
+```
+1. POST /api/user/register       (sin token - [AllowAnonymous])
+   ↓
+2. POST /api/user/login          (sin token - [AllowAnonymous])
+   ↓ Retorna JWT Token
+   
+3. GET /api/hotel                (con token - [Authorize])
+   Authorization: Bearer <token>
+   ↓ Respuesta autorizada
+```
 
-## Desarrollo
+### Configuración JWT
 
-### Agregar un nuevo modelo
+- **Algorithm**: HS256 (HMAC SHA-256)
+- **Secret Key**: Mínimo 32 caracteres
+- **Issuer**: `persist-net-backend`
+- **Audience**: `persist-net-users`
+- **Expiration**: Configurable (default 60 minutos)
+- **Clock Skew**: 0 segundos (sin tolerancia)
 
-1. Crea la clase en `Models/`
-2. Agrega el DbSet a `AppDbContext`
-3. Crea una migración: `dotnet ef migrations add AddNewModel`
-4. Ejecuta: `dotnet ef database update`
+### Endpoints Públicos
+- `POST /api/user/login` - Sin token requerido
+- `POST /api/user/register` - ⚠️ Requiere token (register no es público)
 
-### Agregar un nuevo servicio
+### Endpoints Protegidos
+- Todos los demás endpoints requieren `Authorization: Bearer <token>`
 
-1. Crea la interfaz en `Services/`
-2. Crea la implementación
-3. Registra en `Program.cs`: `builder.Services.AddScoped<IService, Service>();`
+## 📮 Postman Collection
 
-## Troubleshooting
+### Uso
 
-### Connection String no se encuentra
-Asegurate de que:
-- El archivo `.env` existe en la raíz del proyecto
-- La variable `CONNECTION_STRING` está definida
-- El servidor SQL Server es accesible
+1. Ve a carpeta `/Postman`
+2. Abre **Postman**
+3. Click **Import** y selecciona:
+   - `PersistNetBackend.postman_collection.json`
+   - `PersistNetBackend.postman_environment.json`
 
-### Migraciones fallidas
+4. Selecciona ambiente: **Persist.NET - Development**
+5. Ve a **Authentication** → **Login** → **Send**
+6. El token se guarda automáticamente en `{{jwt_token}}`
+
+Ver [Postman/README.md](Postman/README.md) para guía completa.
+
+## 🛠️ API Endpoints
+
+Total: **50+ endpoints** organizados en 13 carpetas
+
+### Autenticación
+- `POST /api/user/login` - Login sin token
+- `POST /api/user/register` - Register (requiere token)
+
+### Entidades (Patrón CRUD estándar)
+Para cada entidad (hotel, cliente, habitación, etc.):
+- `GET /api/{entity}` - Obtener todos
+- `GET /api/{entity}/{id}` - Obtener por ID
+- `POST /api/{entity}` - Crear
+- `PUT /api/{entity}/{id}` - Actualizar
+- `DELETE /api/{entity}/{id}` - Eliminar
+- `GET /api/{entity}/{filter}/...` - Filtros especiales (por hotel, cliente, etc.)
+
+### Ejemplo: Hotels
 ```bash
-# Ver estado de migraciones
-dotnet ef migrations list
-
-# Revertir última migración (cuidado)
-dotnet ef database update <previous-migration-name>
+GET    /api/hotel                  # Todos los hoteles
+GET    /api/hotel/1                # Hotel 1
+POST   /api/hotel                  # Crear hotel
+PUT    /api/hotel/1                # Actualizar
+DELETE /api/hotel/1                # Eliminar
 ```
 
-## Autor
+## ⚙️ Configuración
 
-Temis
+### appsettings.json (Ejemplo)
 
-## Licencia
+```json
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "Server=localhost;Initial Catalog=persist_db;User ID=sa;Password=..."
+  },
+  "Jwt": {
+    "SecretKey": "persist-net-super-secret-key-very-long-string",
+    "Issuer": "persist-net-backend",
+    "Audience": "persist-net-users",
+    "ExpirationMinutes": 60
+  },
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information"
+    }
+  }
+}
+```
 
-MIT
+### Variables de Entorno Soportadas
 
----
+| Variable | Fallback (appsettings) | Default |
+|----------|----------------------|---------|
+| `JWT_SECRET_KEY` | `Jwt:SecretKey` | ❌ Requerido |
+| `JWT_ISSUER` | `Jwt:Issuer` | `persist-net-backend` |
+| `JWT_AUDIENCE` | `Jwt:Audience` | `persist-net-users` |
+| `JWT_EXPIRATION_MINUTES` | `Jwt:ExpirationMinutes` | `60` |
 
-**Última actualización:** 14 de marzo de 2026
+## 🔍 Zonas Horarias
+
+- **DateTime.Now** se usa en toda la aplicación (hora local)
+- JWT `ValidTo` se convierte a hora local con `.ToLocalTime()`
+- `ExpiresAt` en sesiones = expiración real del token (no hardcoded +24h)
+- Consistencia: ambas capas usan `DateTime.Now` (no UTC)
+
+## 📝 Crear Migraciones
+
+### Windows
+```powershell
+.\scripts\migrate-windows.ps1 -MigrationName "AddNewFeature"
+```
+
+### Linux/macOS
+```bash
+./scripts/migrate.sh AddNewFeature
+```
+
+O directamente:
+```bash
+dotnet ef migrations add AddNewFeature
+dotnet ef database update
+```
+
+## 🔒 Seguridad
+
+✅ **Implementado:**
+- Hash SHA-256 para contraseñas (no plaintext)
+- JWT con firma HMAC
+- Bearer token en Authorization header
+- HTTPS obligatorio (certificado autofirmado en dev)
+- Entity Framework previene SQL Injection
+- Autorización [Authorize] en la mayoría de endpoints
+- Expiración real de tokens (no hardcoded)
+- Captura de IP del cliente en sesiones
+
+⚠️ **En Producción:**
+- Cambiar secreto de JWT
+- Usar certificado HTTPS válido (no autofirmado)
+- Configurar CORS si es necesario
+- Usar HTTPS only
+- Strong password policy
+
+## 🧪 Testing
+
+### Flujo Completo de Ejemplo
+
+```
+1. Register nuevo usuario
+   POST /api/user/register
+   
+2. Login para obtener token
+   POST /api/user/login
+   
+3. Crear hotel
+   POST /api/hotel
+   Headers: Authorization: Bearer {token}
+   
+4. Crear habitación para ese hotel
+   POST /api/habitacion
+   
+5. Crear cliente
+   POST /api/cliente
+   
+6. Crear reserva
+   POST /api/reserva (cliente + habitación)
+   
+7. Crear factura
+   POST /api/factura
+   
+8. Registrar pago
+   POST /api/pago
+```
+
+Ver [Postman/README.md](Postman/README.md) para casos de uso detallados.
+
+## 🐛 Troubleshooting
+
+### Error: "401 Unauthorized"
+- Ejecutar login primero: `POST /api/user/login`
+- Verificar que el token está en `Authorization: Bearer <token>`
+- Verificar que el ambiente está seleccionado en Postman
+
+### Error: "Connection String no encontrado"
+```powershell
+# Verificar appsettings.json
+cat appsettings.json | grep ConnectionStrings
+
+# O usar variable de entorno
+$env:ConnectionStrings__DefaultConnection = "..."
+```
+
+### Error: "SSL Certificate Error"
+Normal en desarrollo con certificado autofirmado.
+- Postman lo acepta automáticamente
+- En navegador: Advanced → Proceed anyway
+
+### Error: "404 Not Found" en IP local
+- Verificar IP con `ipconfig`
+- Confirmar que el servidor está corriendo
+- Usar `/api/` en la URL
+
+### Error: "IP es ::1 en lugar de x.x.x.x"
+- IPv6 localhost
+- Normal en desarrollo
+- Postman convierte automáticamente
+
+## 📖 Documentación Adicional
+
+- [Postman Collection Guide](./Postman/README.md) - Todos los endpoints
+- [Swagger/OpenAPI](https://localhost:7151/swagger) - Documentación interactiva
+
+## 📝 Release Notes
+
+### v1.0 - March 15, 2026
+✅ **Completado:**
+- 13 Controladores CRUD
+- 14 Repositorios + 14 Servicios
+- JWT Authentication con Bearer tokens
+- Autorización granular (login público, resto protegido)
+- Sesiones con Ipseguimiento de IP y expiración real
+- Postman Collection con 50+ endpoints
+- Migraciones automáticas
+- Configuración flexible (env variables + appsettings)
+- Escucha en 0.0.0.0 (accesible desde red local)
+
+## ✍️ Autor
+
+**Temis** - UOC
+
+## 📄 Licencia
+
+MIT License - Ver LICENSE.txt
