@@ -24,6 +24,6 @@ namespace persist_net_backend.Models
         public DateTime LastModifiedAt { get; set; } = DateTime.Now;
 
         // Relations
-        public ICollection<Tarifa> Tarifas { get; set; } = new List<Tarifa>();
+        public virtual ICollection<Tarifa> Tarifas { get; set; } = new List<Tarifa>();
     }
 }

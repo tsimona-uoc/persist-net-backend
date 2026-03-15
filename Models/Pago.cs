@@ -31,7 +31,7 @@ namespace persist_net_backend.Models
         public DateTime LastModifiedAt { get; set; } = DateTime.Now;
 
         // Relaciones
-        public Factura? Factura { get; set; }
-        public MetodoPago? MetodoPago { get; set; }
+        public virtual Factura? Factura { get; set; }
+        public virtual MetodoPago? MetodoPago { get; set; }
     }
 }

@@ -361,7 +361,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"numero\": \"101\",\n  \"piso\": 1,\n  \"tipoHabitacionId\": 1,\n  \"hotelId\": 1,\n  \"estado\": 1\n}"
+              "raw": "{\n  \"numero\": \"101\",\n  \"piso\": 1,\n  \"tipoHabitacionId\": 1,\n  \"hotelId\": 1,\n  \"estadoHabitacionId\": 1\n}"
             },
             "url": {
               "raw": "{{base_url}}/habitacion",
@@ -386,7 +386,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"id\": 1,\n  \"numero\": \"101\",\n  \"piso\": 1,\n  \"tipoHabitacionId\": 1,\n  \"hotelId\": 1,\n  \"estado\": 2\n}"
+              "raw": "{\n  \"id\": 1,\n  \"numero\": \"101\",\n  \"piso\": 1,\n  \"tipoHabitacionId\": 1,\n  \"hotelId\": 1,\n  \"estadoHabitacionId\": 2\n}"
             },
             "url": {
               "raw": "{{base_url}}/habitacion/1",
@@ -460,6 +460,167 @@
               ]
             }
           }
+        },
+        {
+          "name": "Obtener por ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/tipohabitacion/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "tipohabitacion",
+                "1"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Actualizar",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 1,\n  \"nombre\": \"Doble Superior\",\n  \"descripcion\": \"Habitación con cama doble y balcón\",\n  \"capacidad\": 2\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/tipohabitacion/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "tipohabitacion",
+                "1"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Eliminar",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{base_url}}/tipohabitacion/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "tipohabitacion",
+                "1"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Estados de Habitación",
+      "item": [
+        {
+          "name": "Obtener todos",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/estadohabitacion",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "estadohabitacion"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Obtener por ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/estadohabitacion/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "estadohabitacion",
+                "1"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Crear",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Disponible\",\n  \"descripcion\": \"Habitación disponible\",\n  \"activo\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/estadohabitacion",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "estadohabitacion"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Actualizar",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 1,\n  \"nombre\": \"Ocupado\",\n  \"descripcion\": \"Habitación actualmente ocupada\",\n  \"activo\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/estadohabitacion/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "estadohabitacion",
+                "1"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Eliminar",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{base_url}}/estadohabitacion/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "estadohabitacion",
+                "1"
+              ]
+            }
+          }
         }
       ]
     },
@@ -527,7 +688,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"clienteId\": 1,\n  \"habitacionId\": 1,\n  \"fechaEntrada\": \"2026-04-10\",\n  \"fechaSalida\": \"2026-04-15\",\n  \"estado\": 1\n}"
+              "raw": "{\n  \"clienteId\": 1,\n  \"habitacionId\": 1,\n  \"fechaEntrada\": \"2026-04-10\",\n  \"fechaSalida\": \"2026-04-15\",\n  \"estadoReservaId\": 1\n}"
             },
             "url": {
               "raw": "{{base_url}}/reserva",
@@ -539,9 +700,171 @@
               ]
             }
           }
+        },
+        {
+          "name": "Obtener por ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/reserva/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "reserva",
+                "1"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Actualizar",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 1,\n  \"clienteId\": 1,\n  \"habitacionId\": 1,\n  \"fechaEntrada\": \"2026-04-10\",\n  \"fechaSalida\": \"2026-04-15\",\n  \"regimenId\": 1,\n  \"estadoReservaId\": 1\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/reserva/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "reserva",
+                "1"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Eliminar",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{base_url}}/reserva/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "reserva",
+                "1"
+              ]
+            }
+          }
         }
       ]
     },
+    {
+      "name": "Estados de Reserva",
+      "item": [
+        {
+          "name": "Obtener todos",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/estadoreserva",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "estadoreserva"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Obtener por ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/estadoreserva/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "estadoreserva",
+                "1"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Crear",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Confirmada\",\n  \"descripcion\": \"Reserva confirmada y pagada\",\n  \"activo\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/estadoreserva",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "estadoreserva"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Actualizar",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 1,\n  \"nombre\": \"Cancelada\",\n  \"descripcion\": \"Reserva cancelada por el cliente\",\n  \"activo\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/estadoreserva/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "estadoreserva",
+                "1"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Eliminar",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{base_url}}/estadoreserva/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "estadoreserva",
+                "1"
+              ]
+            }
+          }
+        }
+      ]
+    },
+
     {
       "name": "Tarifas",
       "item": [
@@ -581,6 +904,64 @@
               ],
               "path": [
                 "tarifa"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Obtener por ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/tarifa/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "tarifa",
+                "1"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Actualizar",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 1,\n  \"temporadaId\": 1,\n  \"tipoHabitacionId\": 1,\n  \"regimenId\": 1,\n  \"precioNoche\": 120.00\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/tarifa/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "tarifa",
+                "1"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Eliminar",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{base_url}}/tarifa/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "tarifa",
+                "1"
               ]
             }
           }
@@ -629,6 +1010,64 @@
               ]
             }
           }
+        },
+        {
+          "name": "Obtener por ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/temporada/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "temporada",
+                "1"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Actualizar",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 1,\n  \"nombre\": \"Temporada Alta\",\n  \"descripcion\": \"Temporada con mayor demanda\",\n  \"fechaInicio\": \"2026-07-01\",\n  \"fechaFin\": \"2026-08-31\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/temporada/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "temporada",
+                "1"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Eliminar",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{base_url}}/temporada/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "temporada",
+                "1"
+              ]
+            }
+          }
         }
       ]
     },
@@ -646,6 +1085,22 @@
               ],
               "path": [
                 "regimen"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Obtener por ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/regimen/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "regimen",
+                "1"
               ]
             }
           }
@@ -674,6 +1129,48 @@
               ]
             }
           }
+        },
+        {
+          "name": "Actualizar",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 1,\n  \"nombre\": \"Alojamiento y Desayuno\",\n  \"descripcion\": \"AD - Incluye alojamiento y desayuno\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/regimen/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "regimen",
+                "1"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Eliminar",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{base_url}}/regimen/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "regimen",
+                "1"
+              ]
+            }
+          }
         }
       ]
     },
@@ -691,6 +1188,22 @@
               ],
               "path": [
                 "metodopago"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Obtener por ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/metodopago/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "metodopago",
+                "1"
               ]
             }
           }
@@ -719,6 +1232,48 @@
               ]
             }
           }
+        },
+        {
+          "name": "Actualizar",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 1,\n  \"nombre\": \"Tarjeta de Crédito\",\n  \"descripcion\": \"Pago con tarjeta de crédito\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/metodopago/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "metodopago",
+                "1"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Eliminar",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{base_url}}/metodopago/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "metodopago",
+                "1"
+              ]
+            }
+          }
         }
       ]
     },
@@ -736,6 +1291,22 @@
               ],
               "path": [
                 "factura"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Obtener por ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/factura/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "factura",
+                "1"
               ]
             }
           }
@@ -769,7 +1340,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"clienteId\": 1,\n  \"estanciaId\": 1,\n  \"montoTotal\": 500.00,\n  \"estado\": 1\n}"
+              "raw": "{\n  \"clienteId\": 1,\n  \"estanciaId\": 1,\n  \"montoTotal\": 500.00\n}"
             },
             "url": {
               "raw": "{{base_url}}/factura",
@@ -778,6 +1349,48 @@
               ],
               "path": [
                 "factura"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Actualizar",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 1,\n  \"clienteId\": 1,\n  \"estanciaId\": 1,\n  \"montoTotal\": 500.00\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/factura/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "factura",
+                "1"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Eliminar",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{base_url}}/factura/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "factura",
+                "1"
               ]
             }
           }
@@ -798,6 +1411,22 @@
               ],
               "path": [
                 "pago"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Obtener por ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/pago/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "pago",
+                "1"
               ]
             }
           }
@@ -843,6 +1472,48 @@
               ]
             }
           }
+        },
+        {
+          "name": "Actualizar",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 1,\n  \"facturaId\": 1,\n  \"metodoPagoId\": 1,\n  \"montoSaldo\": 500.00,\n  \"fechaPago\": \"2026-04-15\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/pago/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "pago",
+                "1"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Eliminar",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{base_url}}/pago/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "pago",
+                "1"
+              ]
+            }
+          }
         }
       ]
     },
@@ -860,6 +1531,22 @@
               ],
               "path": [
                 "servicioextra"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Obtener por ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/servicioextra/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "servicioextra",
+                "1"
               ]
             }
           }
@@ -888,6 +1575,48 @@
               ]
             }
           }
+        },
+        {
+          "name": "Actualizar",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 1,\n  \"nombre\": \"Spa\",\n  \"descripcion\": \"Acceso al spa\",\n  \"precioServicio\": 50.00\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/servicioextra/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "servicioextra",
+                "1"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Eliminar",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{base_url}}/servicioextra/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "servicioextra",
+                "1"
+              ]
+            }
+          }
         }
       ]
     },
@@ -910,6 +1639,22 @@
           }
         },
         {
+          "name": "Obtener por ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/estancia/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "estancia",
+                "1"
+              ]
+            }
+          }
+        },
+        {
           "name": "Obtener por Reserva",
           "request": {
             "method": "GET",
@@ -921,6 +1666,176 @@
               "path": [
                 "estancia",
                 "reserva",
+                "1"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Crear",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reservaId\": 1,\n  \"fechaCheckIn\": \"2026-07-01\",\n  \"fechaCheckOut\": \"2026-07-05\",\n  \"estadoEstanciaId\": 1\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/estancia",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "estancia"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Actualizar",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reservaId\": 1,\n  \"fechaCheckIn\": \"2026-07-01\",\n  \"fechaCheckOut\": \"2026-07-06\",\n  \"estadoEstanciaId\": 2\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/estancia/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "estancia",
+                "1"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Eliminar",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{base_url}}/estancia/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "estancia",
+                "1"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Estados de Estancia",
+      "item": [
+        {
+          "name": "Obtener todos",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/estadoestancia",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "estadoestancia"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Obtener por ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/estadoestancia/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "estadoestancia",
+                "1"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Crear",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombre\": \"Activa\",\n  \"descripcion\": \"Estancia activa\",\n  \"activo\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/estadoestancia",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "estadoestancia"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Actualizar",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 1,\n  \"nombre\": \"Finalizada\",\n  \"descripcion\": \"Estancia finalizada\",\n  \"activo\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/estadoestancia/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "estadoestancia",
+                "1"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Eliminar",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{base_url}}/estadoestancia/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "estadoestancia",
                 "1"
               ]
             }

@@ -24,6 +24,6 @@ namespace persist_net_backend.Models
         public DateTime LastModifiedAt { get; set; } = DateTime.Now;
 
         // Relaciones
-        public Temporada? Temporada { get; set; }
+        public virtual Temporada? Temporada { get; set; }
     }
 }

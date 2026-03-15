@@ -35,7 +35,7 @@ namespace persist_net_backend.Models
         public DateTime LastModifiedAt { get; set; } = DateTime.Now;
 
         // Relaciones
-        public ICollection<Reserva> Reservas { get; set; } = new List<Reserva>();
-        public ICollection<Factura> Facturas { get; set; } = new List<Factura>();
+        public virtual ICollection<Reserva> Reservas { get; set; } = new List<Reserva>();
+        public virtual ICollection<Factura> Facturas { get; set; } = new List<Factura>();
     }
 }

@@ -45,10 +45,10 @@ namespace persist_net_backend.Models
         public DateTime LastModifiedAt { get; set; } = DateTime.Now;
 
         // Relaciones
-        public Cliente? Cliente { get; set; }
-        public Habitacion? Habitacion { get; set; }
-        public Regimen? Regimen { get; set; }
-        public EstadoReserva? EstadoReserva { get; set; }
-        public ICollection<Estancia> Estancias { get; set; } = new List<Estancia>();
+        public virtual Cliente? Cliente { get; set; }
+        public virtual Habitacion? Habitacion { get; set; }
+        public virtual Regimen? Regimen { get; set; }
+        public virtual EstadoReserva? EstadoReserva { get; set; }
+        public virtual ICollection<Estancia> Estancias { get; set; } = new List<Estancia>();
     }
 }

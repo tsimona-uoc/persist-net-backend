@@ -45,7 +45,9 @@ namespace persist_net_backend.Controllers
             {
                 Nombre = regimen.Nombre,
                 Descripcion = regimen.Descripcion ?? string.Empty,
-                Activo = regimen.Activo
+                Activo = regimen.Activo,
+                LastModifiedAt = DateTime.Now,
+                LastModifiedBy = "system"
             });
             return CreatedAtAction(nameof(GetRegimen), new { id = createdRegimen.Id }, createdRegimen);
         }
@@ -63,6 +65,8 @@ namespace persist_net_backend.Controllers
             existingRegimen.Nombre = regimen.Nombre ?? existingRegimen.Nombre;
             existingRegimen.Descripcion = regimen.Descripcion ?? existingRegimen.Descripcion;
             existingRegimen.Activo = regimen.Activo ?? existingRegimen.Activo;
+            existingRegimen.LastModifiedAt = DateTime.Now;
+            existingRegimen.LastModifiedBy = "system";
 
             await _regimenService.UpdateRegimenAsync(existingRegimen);
             return NoContent();
