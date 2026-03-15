@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using persist_net_backend.DTOs.Reserva;
 using persist_net_backend.Models;
 using persist_net_backend.Services;
 
@@ -49,21 +50,28 @@ namespace persist_net_backend.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Reserva>> CreateReserva([FromBody] Reserva reserva)
+        public async Task<ActionResult<Reserva>> CreateReserva([FromBody] CreateReservaRequest reserva)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var createdReserva = await _reservaService.CreateReservaAsync(reserva);
+            var createdReserva = await _reservaService.CreateReservaAsync(new Reserva
+            {
+                ClienteId = reserva.ClienteId,
+                HabitacionId = reserva.HabitacionId,
+                FechaEntrada = reserva.FechaEntrada,
+                FechaSalida = reserva.FechaSalida,
+                RegimenId = reserva.RegimenId,
+                EstadoReservaId = reserva.EstadoReservaId,
+                LastModifiedBy = "system",
+                LastModifiedAt = DateTime.Now
+            });
             return CreatedAtAction(nameof(GetReserva), new { id = createdReserva.Id }, createdReserva);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateReserva(int id, [FromBody] Reserva reserva)
+        public async Task<IActionResult> UpdateReserva(int id, [FromBody] UpdateReservaRequest reserva)
         {
-            if (id != reserva.Id)
-                return BadRequest("ID mismatch");
-
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
@@ -71,7 +79,16 @@ namespace persist_net_backend.Controllers
             if (existingReserva == null)
                 return NotFound();
 
-            await _reservaService.UpdateReservaAsync(reserva);
+            existingReserva.ClienteId = reserva.ClienteId ?? existingReserva.ClienteId;
+            existingReserva.HabitacionId = reserva.HabitacionId ?? existingReserva.HabitacionId;
+            existingReserva.FechaEntrada = reserva.FechaEntrada ?? existingReserva.FechaEntrada;
+            existingReserva.FechaSalida = reserva.FechaSalida ?? existingReserva.FechaSalida;
+            existingReserva.RegimenId = reserva.RegimenId ?? existingReserva.RegimenId;
+            existingReserva.EstadoReservaId = reserva.EstadoReservaId ?? existingReserva.EstadoReservaId;
+            existingReserva.LastModifiedBy = "system";
+            existingReserva.LastModifiedAt = DateTime.Now;
+
+            await _reservaService.UpdateReservaAsync(existingReserva);
             return NoContent();
         }
 

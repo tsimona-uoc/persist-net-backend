@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using persist_net_backend.DTOs.ConsumoExtra;
 using persist_net_backend.Models;
 using persist_net_backend.Services;
 
@@ -42,21 +43,28 @@ namespace persist_net_backend.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<ConsumoExtra>> CreateConsumoExtra([FromBody] ConsumoExtra consumoExtra)
+        public async Task<ActionResult<ConsumoExtra>> CreateConsumoExtra([FromBody] CreateConsumoExtraRequest consumoExtra)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var createdConsumoExtra = await _consumoExtraService.CreateConsumoExtraAsync(consumoExtra);
+            var createdConsumoExtra = await _consumoExtraService.CreateConsumoExtraAsync(new ConsumoExtra
+            {
+                EstanciaId = consumoExtra.EstanciaId,
+                ServicioExtraId = consumoExtra.ServicioExtraId,
+                Cantidad = consumoExtra.Cantidad,
+                PrecioUnitario = consumoExtra.PrecioUnitario,
+                Fecha = consumoExtra.Fecha,
+                LastModifiedBy = "system",
+                LastModifiedAt = DateTime.Now
+            });
+
             return CreatedAtAction(nameof(GetConsumoExtra), new { id = createdConsumoExtra.Id }, createdConsumoExtra);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateConsumoExtra(int id, [FromBody] ConsumoExtra consumoExtra)
+        public async Task<IActionResult> UpdateConsumoExtra(int id, [FromBody] UpdateConsumoExtraRequest consumoExtra)
         {
-            if (id != consumoExtra.Id)
-                return BadRequest("ID mismatch");
-
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
@@ -64,7 +72,15 @@ namespace persist_net_backend.Controllers
             if (existingConsumoExtra == null)
                 return NotFound();
 
-            await _consumoExtraService.UpdateConsumoExtraAsync(consumoExtra);
+            existingConsumoExtra.EstanciaId = consumoExtra.EstanciaId ?? existingConsumoExtra.EstanciaId;
+            existingConsumoExtra.ServicioExtraId = consumoExtra.ServicioExtraId ?? existingConsumoExtra.ServicioExtraId;
+            existingConsumoExtra.Cantidad = consumoExtra.Cantidad ?? existingConsumoExtra.Cantidad;
+            existingConsumoExtra.PrecioUnitario = consumoExtra.PrecioUnitario ?? existingConsumoExtra.PrecioUnitario;
+            existingConsumoExtra.Fecha = consumoExtra.Fecha ?? existingConsumoExtra.Fecha;
+            existingConsumoExtra.LastModifiedBy = "system";
+            existingConsumoExtra.LastModifiedAt = DateTime.Now;
+
+            await _consumoExtraService.UpdateConsumoExtraAsync(existingConsumoExtra);
             return NoContent();
         }
 

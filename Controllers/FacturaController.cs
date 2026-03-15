@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using persist_net_backend.DTOs.Factura;
 using persist_net_backend.Models;
 using persist_net_backend.Services;
 
@@ -49,21 +50,28 @@ namespace persist_net_backend.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Factura>> CreateFactura([FromBody] Factura factura)
+        public async Task<ActionResult<Factura>> CreateFactura([FromBody] CreateFacturaRequest factura)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var createdFactura = await _facturaService.CreateFacturaAsync(factura);
+            var createdFactura = await _facturaService.CreateFacturaAsync(new Factura
+            {
+                EstanciaId = factura.EstanciaId,
+                ClienteId = factura.ClienteId,
+                Descuento = factura.Descuento ?? 0.0m,
+                Total = factura.Total,
+                FechaEmision = factura.FechaEmision ?? DateTime.Now,
+                Pagada = factura.Pagada,
+                LastModifiedBy = "system",
+                LastModifiedAt = DateTime.Now
+            });
             return CreatedAtAction(nameof(GetFactura), new { id = createdFactura.Id }, createdFactura);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateFactura(int id, [FromBody] Factura factura)
+        public async Task<IActionResult> UpdateFactura(int id, [FromBody] UpdateFacturaRequest factura)
         {
-            if (id != factura.Id)
-                return BadRequest("ID mismatch");
-
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
@@ -71,7 +79,16 @@ namespace persist_net_backend.Controllers
             if (existingFactura == null)
                 return NotFound();
 
-            await _facturaService.UpdateFacturaAsync(factura);
+            existingFactura.EstanciaId = factura.EstanciaId ?? existingFactura.EstanciaId;
+            existingFactura.ClienteId = factura.ClienteId ?? existingFactura.ClienteId;
+            existingFactura.Descuento = factura.Descuento ?? existingFactura.Descuento;
+            existingFactura.Total = factura.Total ?? existingFactura.Total;
+            existingFactura.FechaEmision = factura.FechaEmision ?? existingFactura.FechaEmision;
+            existingFactura.Pagada = factura.Pagada ?? existingFactura.Pagada;
+            existingFactura.LastModifiedBy = "system";
+            existingFactura.LastModifiedAt = DateTime.Now;
+
+            await _facturaService.UpdateFacturaAsync(existingFactura);
             return NoContent();
         }
 

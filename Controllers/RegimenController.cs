@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using persist_net_backend.DTOs.Regimen;
 using persist_net_backend.Models;
 using persist_net_backend.Services;
 
@@ -35,21 +36,23 @@ namespace persist_net_backend.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Regimen>> CreateRegimen([FromBody] Regimen regimen)
+        public async Task<ActionResult<Regimen>> CreateRegimen([FromBody] CreateRegimenRequest regimen)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var createdRegimen = await _regimenService.CreateRegimenAsync(regimen);
+            var createdRegimen = await _regimenService.CreateRegimenAsync(new Regimen
+            {
+                Nombre = regimen.Nombre,
+                Descripcion = regimen.Descripcion ?? string.Empty,
+                Activo = regimen.Activo
+            });
             return CreatedAtAction(nameof(GetRegimen), new { id = createdRegimen.Id }, createdRegimen);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateRegimen(int id, [FromBody] Regimen regimen)
+        public async Task<IActionResult> UpdateRegimen(int id, [FromBody] UpdateRegimenRequest regimen)
         {
-            if (id != regimen.Id)
-                return BadRequest("ID mismatch");
-
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
@@ -57,7 +60,11 @@ namespace persist_net_backend.Controllers
             if (existingRegimen == null)
                 return NotFound();
 
-            await _regimenService.UpdateRegimenAsync(regimen);
+            existingRegimen.Nombre = regimen.Nombre ?? existingRegimen.Nombre;
+            existingRegimen.Descripcion = regimen.Descripcion ?? existingRegimen.Descripcion;
+            existingRegimen.Activo = regimen.Activo ?? existingRegimen.Activo;
+
+            await _regimenService.UpdateRegimenAsync(existingRegimen);
             return NoContent();
         }
 

@@ -23,7 +23,8 @@ namespace persist_net_backend.Models
         public int Numero { get; set; }
 
         [Required]
-        public EstadoHabitacionEnum Estado { get; set; } = EstadoHabitacionEnum.LIBRE;
+        [ForeignKey("EstadoHabitacion")]
+        public int EstadoHabitacionId { get; set; }
 
         [Required]
         [StringLength(255)]
@@ -35,6 +36,7 @@ namespace persist_net_backend.Models
         // Relaciones
         public Hotel? Hotel { get; set; }
         public TipoHabitacion? TipoHabitacion { get; set; }
+        public EstadoHabitacion? EstadoHabitacion { get; set; }
         public ICollection<Reserva> Reservas { get; set; } = new List<Reserva>();
     }
 }

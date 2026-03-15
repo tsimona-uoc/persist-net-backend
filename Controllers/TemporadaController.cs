@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using persist_net_backend.DTOs.Temporada;
 using persist_net_backend.Models;
 using persist_net_backend.Services;
 
@@ -35,21 +36,25 @@ namespace persist_net_backend.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Temporada>> CreateTemporada([FromBody] Temporada temporada)
+        public async Task<ActionResult<Temporada>> CreateTemporada([FromBody] CreateTemporadaRequest temporada)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var createdTemporada = await _temporadaService.CreateTemporadaAsync(temporada);
+            var createdTemporada = await _temporadaService.CreateTemporadaAsync(new Temporada
+            {
+                Nombre = temporada.Nombre,
+                FechaInicio = temporada.FechaInicio,
+                FechaFin = temporada.FechaFin,
+                LastModifiedBy = "system",
+                LastModifiedAt = DateTime.Now
+            });
             return CreatedAtAction(nameof(GetTemporada), new { id = createdTemporada.Id }, createdTemporada);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateTemporada(int id, [FromBody] Temporada temporada)
+        public async Task<IActionResult> UpdateTemporada(int id, [FromBody] UpdateTemporadaRequest temporada)
         {
-            if (id != temporada.Id)
-                return BadRequest("ID mismatch");
-
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
@@ -57,7 +62,13 @@ namespace persist_net_backend.Controllers
             if (existingTemporada == null)
                 return NotFound();
 
-            await _temporadaService.UpdateTemporadaAsync(temporada);
+            existingTemporada.Nombre = temporada.Nombre ?? existingTemporada.Nombre;
+            existingTemporada.FechaInicio = temporada.FechaInicio ?? existingTemporada.FechaInicio;
+            existingTemporada.FechaFin = temporada.FechaFin ?? existingTemporada.FechaFin;
+            existingTemporada.LastModifiedBy = "system";
+            existingTemporada.LastModifiedAt = DateTime.Now;
+
+            await _temporadaService.UpdateTemporadaAsync(existingTemporada);
             return NoContent();
         }
 

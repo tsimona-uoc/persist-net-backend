@@ -1,11 +1,29 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace persist_net_backend.Models
 {
-    public enum EstadoReservaEnum
+    public class EstadoReserva
     {
-        CREADA = 1,
-        CONFIRMADA = 2,
-        CANCELADA = 3,
-        NOSHOW = 4,
-        FINALIZADA = 5
+        [Key]
+        public int Id { get; set; }
+
+        [Required]
+        [StringLength(100)]
+        public string Nombre { get; set; } = string.Empty;
+
+        [StringLength(500)]
+        public string Descripcion { get; set; } = string.Empty;
+
+        public bool Activo { get; set; } = true;
+
+        [Required]
+        [StringLength(255)]
+        public string LastModifiedBy { get; set; } = string.Empty;
+
+        [Required]
+        public DateTime LastModifiedAt { get; set; } = DateTime.Now;
+
+        // Relaciones
+        public ICollection<Reserva> Reservas { get; set; } = new List<Reserva>();
     }
 }

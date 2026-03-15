@@ -16,15 +16,14 @@ namespace persist_net_backend.Models
 
         public bool Activo { get; set; } = true;
 
+        [Required]
+        [StringLength(255)]
+        public string LastModifiedBy { get; set; } = string.Empty;
+
+        [Required]
+        public DateTime LastModifiedAt { get; set; } = DateTime.Now;
+
         // Relations
         public ICollection<Pago> Pagos { get; set; } = new List<Pago>();
     }
-
-    public enum MetodoPagoEnum
-    {
-        EFECTIVO = 1,
-        TARJETA = 2,
-        TRANSFERENCIA = 3
-    }
 }
-

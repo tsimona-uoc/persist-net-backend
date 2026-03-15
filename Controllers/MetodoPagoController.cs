@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using persist_net_backend.DTOs.MetodoPago;
 using persist_net_backend.Models;
 using persist_net_backend.Services;
 
@@ -35,21 +36,23 @@ namespace persist_net_backend.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<MetodoPago>> CreateMetodoPago([FromBody] MetodoPago metodoPago)
+        public async Task<ActionResult<MetodoPago>> CreateMetodoPago([FromBody] CreateMetodoPagoRequest metodoPago)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var createdMetodoPago = await _metodoPagoService.CreateMetodoPagoAsync(metodoPago);
+            var createdMetodoPago = await _metodoPagoService.CreateMetodoPagoAsync(new MetodoPago
+            {
+                Nombre = metodoPago.Nombre,
+                Descripcion = metodoPago.Descripcion ?? string.Empty,
+                Activo = metodoPago.Activo
+            });
             return CreatedAtAction(nameof(GetMetodoPago), new { id = createdMetodoPago.Id }, createdMetodoPago);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateMetodoPago(int id, [FromBody] MetodoPago metodoPago)
+        public async Task<IActionResult> UpdateMetodoPago(int id, [FromBody] UpdateMetodoPagoRequest metodoPago)
         {
-            if (id != metodoPago.Id)
-                return BadRequest("ID mismatch");
-
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
@@ -57,7 +60,11 @@ namespace persist_net_backend.Controllers
             if (existingMetodoPago == null)
                 return NotFound();
 
-            await _metodoPagoService.UpdateMetodoPagoAsync(metodoPago);
+            existingMetodoPago.Nombre = metodoPago.Nombre ?? existingMetodoPago.Nombre;
+            existingMetodoPago.Descripcion = metodoPago.Descripcion ?? existingMetodoPago.Descripcion;
+            existingMetodoPago.Activo = metodoPago.Activo ?? existingMetodoPago.Activo;
+
+            await _metodoPagoService.UpdateMetodoPagoAsync(existingMetodoPago);
             return NoContent();
         }
 

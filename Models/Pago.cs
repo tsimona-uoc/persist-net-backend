@@ -13,7 +13,8 @@ namespace persist_net_backend.Models
         public int FacturaId { get; set; }
 
         [Required]
-        public MetodoPagoEnum Metodo { get; set; }
+        [ForeignKey("MetodoPago")]
+        public int MetodoPagoId { get; set; }
 
         [Required]
         [Column(TypeName = "decimal(10, 2)")]
@@ -31,5 +32,6 @@ namespace persist_net_backend.Models
 
         // Relaciones
         public Factura? Factura { get; set; }
+        public MetodoPago? MetodoPago { get; set; }
     }
 }

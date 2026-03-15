@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using persist_net_backend.DTOs.Pago;
 using persist_net_backend.Models;
 using persist_net_backend.Services;
 
@@ -42,21 +43,26 @@ namespace persist_net_backend.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Pago>> CreatePago([FromBody] Pago pago)
+        public async Task<ActionResult<Pago>> CreatePago([FromBody] CreatePagoRequest pago)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var createdPago = await _pagoService.CreatePagoAsync(pago);
+            var createdPago = await _pagoService.CreatePagoAsync(new Pago
+            {
+                FacturaId = pago.FacturaId,
+                MetodoPagoId = pago.MetodoPagoId,
+                Importe = pago.Importe,
+                FechaPago = pago.FechaPago ?? DateTime.Now,
+                LastModifiedBy = "system",
+                LastModifiedAt = DateTime.Now
+            });
             return CreatedAtAction(nameof(GetPago), new { id = createdPago.Id }, createdPago);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdatePago(int id, [FromBody] Pago pago)
+        public async Task<IActionResult> UpdatePago(int id, [FromBody] UpdatePagoRequest pago)
         {
-            if (id != pago.Id)
-                return BadRequest("ID mismatch");
-
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
@@ -64,7 +70,14 @@ namespace persist_net_backend.Controllers
             if (existingPago == null)
                 return NotFound();
 
-            await _pagoService.UpdatePagoAsync(pago);
+            existingPago.FacturaId = pago.FacturaId ?? existingPago.FacturaId;
+            existingPago.MetodoPagoId = pago.MetodoPagoId ?? existingPago.MetodoPagoId;
+            existingPago.Importe = pago.Importe ?? existingPago.Importe;
+            existingPago.FechaPago = pago.FechaPago ?? existingPago.FechaPago;
+            existingPago.LastModifiedBy = "system";
+            existingPago.LastModifiedAt = DateTime.Now;
+
+            await _pagoService.UpdatePagoAsync(existingPago);
             return NoContent();
         }
 

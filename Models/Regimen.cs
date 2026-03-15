@@ -16,16 +16,14 @@ namespace persist_net_backend.Models
 
         public bool Activo { get; set; } = true;
 
+        [Required]
+        [StringLength(255)]
+        public string LastModifiedBy { get; set; } = string.Empty;
+
+        [Required]
+        public DateTime LastModifiedAt { get; set; } = DateTime.Now;
+
         // Relations
         public ICollection<Tarifa> Tarifas { get; set; } = new List<Tarifa>();
     }
-
-    public enum RegimenEnum
-    {
-        AD = 1,  // Alojamiento y Desayuno
-        MP = 2,  // Media Pensión
-        PC = 3,  // Pensión Completa
-        TI = 4   // Todo Incluido
-    }
 }
-

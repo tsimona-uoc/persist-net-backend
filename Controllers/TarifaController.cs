@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using persist_net_backend.DTOs.Tarifa;
 using persist_net_backend.Models;
 using persist_net_backend.Services;
 
@@ -35,21 +36,24 @@ namespace persist_net_backend.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Tarifa>> CreateTarifa([FromBody] Tarifa tarifa)
+        public async Task<ActionResult<Tarifa>> CreateTarifa([FromBody] CreateTarifaRequest tarifa)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var createdTarifa = await _tarifaService.CreateTarifaAsync(tarifa);
+            var createdTarifa = await _tarifaService.CreateTarifaAsync(new Tarifa
+            {
+                TemporadaId = tarifa.TemporadaId,
+                PrecioNoche = tarifa.PrecioNoche,
+                LastModifiedBy = "system",
+                LastModifiedAt = DateTime.Now
+            });
             return CreatedAtAction(nameof(GetTarifa), new { id = createdTarifa.Id }, createdTarifa);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateTarifa(int id, [FromBody] Tarifa tarifa)
+        public async Task<IActionResult> UpdateTarifa(int id, [FromBody] UpdateTarifaRequest tarifa)
         {
-            if (id != tarifa.Id)
-                return BadRequest("ID mismatch");
-
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
@@ -57,7 +61,12 @@ namespace persist_net_backend.Controllers
             if (existingTarifa == null)
                 return NotFound();
 
-            await _tarifaService.UpdateTarifaAsync(tarifa);
+            existingTarifa.TemporadaId = tarifa.TemporadaId ?? existingTarifa.TemporadaId;
+            existingTarifa.PrecioNoche = tarifa.PrecioNoche ?? existingTarifa.PrecioNoche;
+            existingTarifa.LastModifiedBy = "system";
+            existingTarifa.LastModifiedAt = DateTime.Now;
+
+            await _tarifaService.UpdateTarifaAsync(existingTarifa);
             return NoContent();
         }
 

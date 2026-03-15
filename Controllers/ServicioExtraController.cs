@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using persist_net_backend.DTOs.ServicioExtra;
 using persist_net_backend.Models;
 using persist_net_backend.Services;
 
@@ -35,21 +36,25 @@ namespace persist_net_backend.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<ServicioExtra>> CreateServicioExtra([FromBody] ServicioExtra servicioExtra)
+        public async Task<ActionResult<ServicioExtra>> CreateServicioExtra([FromBody] CreateServicioExtraRequest servicioExtra)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var createdServicioExtra = await _servicioExtraService.CreateServicioExtraAsync(servicioExtra);
+            var createdServicioExtra = await _servicioExtraService.CreateServicioExtraAsync(new ServicioExtra
+            {
+                Nombre = servicioExtra.Nombre,
+                Descripcion = servicioExtra.Descripcion ?? string.Empty,
+                PrecioBase = servicioExtra.PrecioBase,
+                LastModifiedBy = "system",
+                LastModifiedAt = DateTime.Now
+            });
             return CreatedAtAction(nameof(GetServicioExtra), new { id = createdServicioExtra.Id }, createdServicioExtra);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateServicioExtra(int id, [FromBody] ServicioExtra servicioExtra)
+        public async Task<IActionResult> UpdateServicioExtra(int id, [FromBody] UpdateServicioExtraRequest servicioExtra)
         {
-            if (id != servicioExtra.Id)
-                return BadRequest("ID mismatch");
-
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
@@ -57,7 +62,13 @@ namespace persist_net_backend.Controllers
             if (existingServicioExtra == null)
                 return NotFound();
 
-            await _servicioExtraService.UpdateServicioExtraAsync(servicioExtra);
+            existingServicioExtra.Nombre = servicioExtra.Nombre ?? existingServicioExtra.Nombre;
+            existingServicioExtra.Descripcion = servicioExtra.Descripcion ?? existingServicioExtra.Descripcion;
+            existingServicioExtra.PrecioBase = servicioExtra.PrecioBase ?? existingServicioExtra.PrecioBase;
+            existingServicioExtra.LastModifiedBy = "system";
+            existingServicioExtra.LastModifiedAt = DateTime.Now;
+
+            await _servicioExtraService.UpdateServicioExtraAsync(existingServicioExtra);
             return NoContent();
         }
 
