@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using persist_net_backend.DTOs;
 using persist_net_backend.Services;
@@ -7,6 +8,7 @@ namespace persist_net_backend.Controllers
 
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class UserController : ControllerBase
     {
         private readonly IAuthService _authService;
@@ -16,6 +18,7 @@ namespace persist_net_backend.Controllers
             _authService = authService;
         }
 
+        [AllowAnonymous]
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
@@ -31,7 +34,7 @@ namespace persist_net_backend.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterRequest request)
         {
-            var success = await _authService.RegisterAsync(request.Name, request.Surname, request.Email, request.Password );
+            var success = await _authService.RegisterAsync(request.Name, request.Surname, request.Email, request.Password, request.Role);
             if (!success)
             {
                 return BadRequest();

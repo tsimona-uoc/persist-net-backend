@@ -25,13 +25,18 @@ namespace persist_net_backend.Models
         [Column(TypeName = "nvarchar(255)")]
         public string PasswordHash { get; set; } = string.Empty;
 
+        [ForeignKey("UserRole")]
+        public int? UserRoleId { get; set; }
+
         [NotNull]
         [Column(TypeName = "nvarchar(255)")]
         public string LastModifiedBy { get; set; } = string.Empty;
 
         [NotNull]
         [Column(TypeName = "datetime2")]
-        public DateTime LastModifiedAt { get; set; } = DateTime.UtcNow;
+        public DateTime LastModifiedAt { get; set; } = DateTime.Now;
+
+        public UserRole? UserRole { get; set; }
 
         /// <summary>
         /// Una colección de sesiones activas para este usuario. Cada sesión representa un token JWT emitido para este usuario.

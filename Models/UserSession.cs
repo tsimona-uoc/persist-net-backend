@@ -5,27 +5,35 @@ using Microsoft.EntityFrameworkCore;
 
 namespace persist_net_backend.Models
 {
-    [Index(nameof(UserId), IsUnique = true)]
     public class UserSession
     {
         [Key]
         public Guid Id { get; set; } = Guid.NewGuid();
 
-        [Column(TypeName = "uniqueidentifier")]
+        [Required]
+        [ForeignKey("User")]
         public Guid UserId { get; set; }
 
+        [Required]
         [Column(TypeName = "nvarchar(max)")]
-        public string JwtToken { get; set; } = string.Empty;
+        public string Token { get; set; } = string.Empty;
 
-        [NotNull]
-        [Column(TypeName = "nvarchar(255)")]
+        [Required]
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
+
+        [Required]
+        public DateTime ExpiresAt { get; set; }
+
+        [StringLength(45)]
+        public string IpAddress { get; set; } = string.Empty;
+
+        [Required]
+        [StringLength(255)]
         public string LastModifiedBy { get; set; } = string.Empty;
 
-        [NotNull]
-        [Column(TypeName = "datetime2")]
-        public DateTime LastModifiedAt { get; set; } = DateTime.UtcNow;
+        [Required]
+        public DateTime LastModifiedAt { get; set; } = DateTime.Now;
 
-        [ForeignKey(nameof(UserId))]
-        public User User { get; set; } = null!;
+        public User? User { get; set; }
     }
 }

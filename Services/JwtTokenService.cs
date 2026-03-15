@@ -35,7 +35,8 @@ namespace persist_net_backend.Services
                 ?? "persist-net-users";
             
             _expirationMinutes = int.TryParse(
-                Environment.GetEnvironmentVariable("JWT_EXPIRATION_MINUTES"),
+                Environment.GetEnvironmentVariable("JWT_EXPIRATION_MINUTES") 
+                ?? _configuration["Jwt:ExpirationMinutes"],
                 out var minutes) ? minutes : 60;
         }
 
@@ -49,14 +50,14 @@ namespace persist_net_backend.Services
                 new Claim(ClaimTypes.NameIdentifier, userId.ToString()),
                 new Claim(ClaimTypes.Email, email),
                 new Claim("sub", userId.ToString()),
-                new Claim("iat", DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString())
+                new Claim("iat", DateTimeOffset.Now.ToUnixTimeSeconds().ToString())
             };
 
             var token = new JwtSecurityToken(
                 issuer: _issuer,
                 audience: _audience,
                 claims: claims,
-                expires: DateTime.UtcNow.AddMinutes(_expirationMinutes),
+                expires: DateTime.Now.AddMinutes(_expirationMinutes),
                 signingCredentials: credentials
             );
 

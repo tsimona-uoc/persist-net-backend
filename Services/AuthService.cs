@@ -7,12 +7,14 @@ namespace persist_net_backend.Services
 {
     public class AuthService : IAuthService
     {
+        private readonly IUserRoleRepository _userRoleRepository;
         private readonly IUserRepository _userRepository;
         private readonly IJwtTokenService _jwtTokenService;
 
-        public AuthService(IUserRepository userRepository, IJwtTokenService jwtTokenService)
+        public AuthService(IUserRepository userRepository, IUserRoleRepository userRoleRepository, IJwtTokenService jwtTokenService)
         {
             this._userRepository = userRepository;
+            this._userRoleRepository = userRoleRepository;
             this._jwtTokenService = jwtTokenService;
         }
 
@@ -42,7 +44,7 @@ namespace persist_net_backend.Services
             {
                 // Actualizar la sesión del usuario en BBDD
                 UserSession result = await this._jwtTokenService.UpdateUserSession(user.Id);
-                return (true, result.JwtToken);
+                return (true, result.Token);
             }
             
             return (false, string.Empty);
@@ -57,12 +59,20 @@ namespace persist_net_backend.Services
         /// <param name="email">El email del usuario</param>
         /// <param name="password">El password del usuario</param>
         /// <
-        public Task<bool> RegisterAsync(string name, string surname, string email, string password){
+        public async Task<bool> RegisterAsync(string name, string surname, string email, string password, string role){
+
+            // Validar que el rol proporcionado es válido
+            var userRole = await this._userRoleRepository.GetByCode(role);
+            if (userRole == null)
+            {
+                return false;
+            }
+
             // Verificar si el email ya está registrado
-            var existingUser = _userRepository.findByEmail(email).Result;
+            var existingUser = await _userRepository.findByEmail(email);
             if (existingUser != null)
             {
-                return Task.FromResult(false);
+                return false;
             }
 
             // Calcular el hash SHA-256 del password
@@ -75,13 +85,14 @@ namespace persist_net_backend.Services
                 Surname = surname,
                 Email = email,
                 PasswordHash = hashedPassword,
-                LastModifiedAt = DateTime.UtcNow,
+                UserRoleId = userRole.Id,
+                LastModifiedAt = DateTime.Now,
                 LastModifiedBy = "system"
             };
 
             // Guardar el usuario en la base de datos
-            _userRepository.Add(newUser);
-            return Task.FromResult(true);
+            await _userRepository.Add(newUser);
+            return true;
         }
         
         /// <summary>

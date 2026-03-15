@@ -1,3 +1,4 @@
+using System.IdentityModel.Tokens.Jwt;
 using Microsoft.EntityFrameworkCore;
 using persist_net_backend.Data;
 using persist_net_backend.Models;
@@ -15,6 +16,27 @@ namespace persist_net_backend.Repositories
 
         public async Task<UserSession> UpdateSessionAsync(Guid userId, string token)
         {
+            // Decodificar JWT para obtener la fecha de expiración real
+            var handler = new JwtSecurityTokenHandler();
+            DateTime expiresAt = DateTime.Now.AddHours(24); // Fallback por si acaso
+            
+            try
+            {
+                if (handler.CanReadToken(token))
+                {
+                    var jwtToken = handler.ReadToken(token) as JwtSecurityToken;
+                    if (jwtToken?.ValidTo != null)
+                    {
+                        // Convertir ValidTo de UTC a hora local
+                        expiresAt = jwtToken.ValidTo.ToLocalTime();
+                    }
+                }
+            }
+            catch
+            {
+                // Si ocurre un error al decodificar el token, se usará la fecha de expiración por defecto
+            }
+
             var session = await _context.UserSessions
                 .FirstOrDefaultAsync(s => s.UserId == userId);
 
@@ -23,17 +45,22 @@ namespace persist_net_backend.Repositories
                 session = new UserSession
                 {
                     UserId = userId,
-                    JwtToken = token,
+                    Token = token,
+                    CreatedAt = DateTime.Now,
+                    ExpiresAt = expiresAt,
+                    IpAddress = string.Empty,
                     LastModifiedBy = "system",
-                    LastModifiedAt = DateTime.UtcNow
+                    LastModifiedAt = DateTime.Now
                 };
                 _context.UserSessions.Add(session);
             }
             else
             {
-                session.JwtToken = token;
+                session.Token = token;
+                session.CreatedAt = DateTime.Now;
+                session.ExpiresAt = expiresAt;
                 session.LastModifiedBy = "system";
-                session.LastModifiedAt = DateTime.UtcNow;
+                session.LastModifiedAt = DateTime.Now;
                 _context.UserSessions.Update(session);
             }
 

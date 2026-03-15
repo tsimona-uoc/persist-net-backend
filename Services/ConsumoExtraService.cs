@@ -1,0 +1,45 @@
+using persist_net_backend.Models;
+using persist_net_backend.Repositories;
+
+namespace persist_net_backend.Services
+{
+    public class ConsumoExtraService : IConsumoExtraService
+    {
+        private readonly IConsumoExtraRepository _consumoExtraRepository;
+
+        public ConsumoExtraService(IConsumoExtraRepository consumoExtraRepository)
+        {
+            _consumoExtraRepository = consumoExtraRepository;
+        }
+
+        public async Task<ConsumoExtra?> GetConsumoExtraByIdAsync(int id)
+        {
+            return await _consumoExtraRepository.GetByIdAsync(id);
+        }
+
+        public async Task<IEnumerable<ConsumoExtra>> GetAllConsumosExtraAsync()
+        {
+            return await _consumoExtraRepository.GetAllAsync();
+        }
+
+        public async Task<IEnumerable<ConsumoExtra>> GetConsumoExtrasByEstanciaAsync(int estanciaId)
+        {
+            return await _consumoExtraRepository.GetByEstanciaIdAsync(estanciaId);
+        }
+
+        public async Task<ConsumoExtra> CreateConsumoExtraAsync(ConsumoExtra consumoExtra)
+        {
+            return await _consumoExtraRepository.AddAsync(consumoExtra);
+        }
+
+        public async Task<ConsumoExtra> UpdateConsumoExtraAsync(ConsumoExtra consumoExtra)
+        {
+            return await _consumoExtraRepository.UpdateAsync(consumoExtra);
+        }
+
+        public async Task<bool> DeleteConsumoExtraAsync(int id)
+        {
+            return await _consumoExtraRepository.DeleteAsync(id);
+        }
+    }
+}
