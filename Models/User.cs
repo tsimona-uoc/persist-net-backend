@@ -36,11 +36,11 @@ namespace persist_net_backend.Models
         [Column(TypeName = "datetime2")]
         public DateTime LastModifiedAt { get; set; } = DateTime.Now;
 
-        public UserRole? UserRole { get; set; }
+        public virtual UserRole? UserRole { get; set; }
 
         /// <summary>
         /// Una colección de sesiones activas para este usuario. Cada sesión representa un token JWT emitido para este usuario.
         /// </summary>
-        public ICollection<UserSession> Sessions { get; set; } = new List<UserSession>();
+        public virtual ICollection<UserSession> Sessions { get; set; } = new List<UserSession>();
     }
 }

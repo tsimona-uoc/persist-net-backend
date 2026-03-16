@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using persist_net_backend.DTOs.Regimen;
 using persist_net_backend.Models;
 using persist_net_backend.Services;
 
@@ -17,39 +18,54 @@ namespace persist_net_backend.Controllers
             _regimenService = regimenService;
         }
 
+        private RegimenResponse MapToResponse(Regimen regimen)
+        {
+            return new RegimenResponse
+            {
+                Id = regimen.Id,
+                Nombre = regimen.Nombre,
+                Descripcion = regimen.Descripcion,
+                Activo = regimen.Activo
+            };
+        }
+
         [HttpGet("{id}")]
-        public async Task<ActionResult<Regimen>> GetRegimen(int id)
+        public async Task<ActionResult<RegimenResponse>> GetRegimen(int id)
         {
             var regimen = await _regimenService.GetRegimenByIdAsync(id);
             if (regimen == null)
                 return NotFound();
 
-            return Ok(regimen);
+            return Ok(MapToResponse(regimen));
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Regimen>>> GetAllRegimenes()
+        public async Task<ActionResult<IEnumerable<RegimenResponse>>> GetAllRegimenes()
         {
             var regimenes = await _regimenService.GetAllRegimenesAsync();
-            return Ok(regimenes);
+            return Ok(regimenes.Select(MapToResponse));
         }
 
         [HttpPost]
-        public async Task<ActionResult<Regimen>> CreateRegimen([FromBody] Regimen regimen)
+        public async Task<ActionResult<RegimenResponse>> CreateRegimen([FromBody] CreateRegimenRequest regimen)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var createdRegimen = await _regimenService.CreateRegimenAsync(regimen);
-            return CreatedAtAction(nameof(GetRegimen), new { id = createdRegimen.Id }, createdRegimen);
+            var createdRegimen = await _regimenService.CreateRegimenAsync(new Regimen
+            {
+                Nombre = regimen.Nombre,
+                Descripcion = regimen.Descripcion ?? string.Empty,
+                Activo = regimen.Activo,
+                LastModifiedAt = DateTime.Now,
+                LastModifiedBy = "system"
+            });
+            return CreatedAtAction(nameof(GetRegimen), new { id = createdRegimen.Id }, MapToResponse(createdRegimen));
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateRegimen(int id, [FromBody] Regimen regimen)
+        public async Task<IActionResult> UpdateRegimen(int id, [FromBody] UpdateRegimenRequest regimen)
         {
-            if (id != regimen.Id)
-                return BadRequest("ID mismatch");
-
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
@@ -57,7 +73,13 @@ namespace persist_net_backend.Controllers
             if (existingRegimen == null)
                 return NotFound();
 
-            await _regimenService.UpdateRegimenAsync(regimen);
+            existingRegimen.Nombre = regimen.Nombre ?? existingRegimen.Nombre;
+            existingRegimen.Descripcion = regimen.Descripcion ?? existingRegimen.Descripcion;
+            existingRegimen.Activo = regimen.Activo ?? existingRegimen.Activo;
+            existingRegimen.LastModifiedAt = DateTime.Now;
+            existingRegimen.LastModifiedBy = "system";
+
+            await _regimenService.UpdateRegimenAsync(existingRegimen);
             return NoContent();
         }
 

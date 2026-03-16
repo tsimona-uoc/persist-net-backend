@@ -23,10 +23,12 @@ namespace persist_net_backend.Models
         public DateOnly FechaSalida { get; set; }
 
         [Required]
-        public RegimenEnum Regimen { get; set; }
+        [ForeignKey("Regimen")]
+        public int RegimenId { get; set; }
 
         [Required]
-        public EstadoReservaEnum Estado { get; set; } = EstadoReservaEnum.CREADA;
+        [ForeignKey("EstadoReserva")]
+        public int EstadoReservaId { get; set; }
 
         [Required]
         [Column(TypeName = "decimal(10, 2)")]
@@ -43,8 +45,10 @@ namespace persist_net_backend.Models
         public DateTime LastModifiedAt { get; set; } = DateTime.Now;
 
         // Relaciones
-        public Cliente? Cliente { get; set; }
-        public Habitacion? Habitacion { get; set; }
-        public ICollection<Estancia> Estancias { get; set; } = new List<Estancia>();
+        public virtual Cliente? Cliente { get; set; }
+        public virtual Habitacion? Habitacion { get; set; }
+        public virtual Regimen? Regimen { get; set; }
+        public virtual EstadoReserva? EstadoReserva { get; set; }
+        public virtual ICollection<Estancia> Estancias { get; set; } = new List<Estancia>();
     }
 }

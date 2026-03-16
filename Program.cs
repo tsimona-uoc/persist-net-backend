@@ -37,10 +37,10 @@ public class Program {
 
         var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
-        builder.Services.AddDbContext<AppDbContext>(options =>
-            options.UseSqlServer(
-                connectionString,
-                x => x.MigrationsAssembly("persist_net_backend")));
+        builder.Services.AddDbContext<AppDbContext>(options => {
+            options.UseSqlServer(connectionString, x => x.MigrationsAssembly("persist_net_backend"));
+            options.UseLazyLoadingProxies();
+        });
 
         #endregion
 
@@ -70,6 +70,11 @@ public class Program {
         builder.Services.AddScoped<IPagoRepository, PagoRepository>();
         builder.Services.AddScoped<IMetodoPagoRepository, MetodoPagoRepository>();
         builder.Services.AddScoped<IRegimenRepository, RegimenRepository>();
+
+        // Lookup / Parametric Repositories
+        builder.Services.AddScoped<IEstadoHabitacionRepository, EstadoHabitacionRepository>();
+        builder.Services.AddScoped<IEstadoReservaRepository, EstadoReservaRepository>();
+        builder.Services.AddScoped<IEstadoEstanciaRepository, EstadoEstanciaRepository>();
 
         // Export Repository
         builder.Services.AddScoped<IExportRepository, ExportRepository>();
@@ -102,9 +107,6 @@ public class Program {
         builder.Services.AddScoped<IPagoService, PagoService>();
         builder.Services.AddScoped<IMetodoPagoService, MetodoPagoService>();
         builder.Services.AddScoped<IRegimenService, RegimenService>();
-
-        // Export Service
-        builder.Services.AddScoped<IExportService, ExportService>();
     }
 
     public static void RegisterAuthentication(WebApplicationBuilder builder)
