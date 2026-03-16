@@ -34,7 +34,7 @@ namespace persist_net_backend.Models
         public DateTime LastModifiedAt { get; set; } = DateTime.Now;
 
         // Relaciones
-        public Estancia? Estancia { get; set; }
-        public ServicioExtra? ServicioExtra { get; set; }
+        public virtual Estancia? Estancia { get; set; }
+        public virtual ServicioExtra? ServicioExtra { get; set; }
     }
 }

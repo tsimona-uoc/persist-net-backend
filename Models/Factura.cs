@@ -38,8 +38,8 @@ namespace persist_net_backend.Models
         public DateTime LastModifiedAt { get; set; } = DateTime.Now;
 
         // Relaciones
-        public Estancia? Estancia { get; set; }
-        public Cliente? Cliente { get; set; }
-        public ICollection<Pago> Pagos { get; set; } = new List<Pago>();
+        public virtual Estancia? Estancia { get; set; }
+        public virtual Cliente? Cliente { get; set; }
+        public virtual ICollection<Pago> Pagos { get; set; } = new List<Pago>();
     }
 }

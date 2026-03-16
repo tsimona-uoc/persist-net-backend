@@ -31,6 +31,6 @@ namespace persist_net_backend.Models
         public DateTime LastModifiedAt { get; set; } = DateTime.Now;
 
         // Relaciones
-        public ICollection<Habitacion> Habitaciones { get; set; } = new List<Habitacion>();
+        public virtual ICollection<Habitacion> Habitaciones { get; set; } = new List<Habitacion>();
     }
 }

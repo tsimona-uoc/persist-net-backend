@@ -27,6 +27,6 @@ namespace persist_net_backend.Models
         public DateTime LastModifiedAt { get; set; } = DateTime.Now;
 
         // Relaciones
-        public ICollection<ConsumoExtra> ConsumosExtra { get; set; } = new List<ConsumoExtra>();
+        public virtual ICollection<ConsumoExtra> ConsumosExtra { get; set; } = new List<ConsumoExtra>();
     }
 }

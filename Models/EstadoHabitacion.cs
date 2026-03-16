@@ -1,10 +1,29 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace persist_net_backend.Models
 {
-    public enum EstadoHabitacionEnum
+    public class EstadoHabitacion
     {
-        LIBRE = 1,
-        OCUPADA = 2,
-        LIMPIEZA = 3,
-        MANTENIMIENTO = 4
+        [Key]
+        public int Id { get; set; }
+
+        [Required]
+        [StringLength(100)]
+        public string Nombre { get; set; } = string.Empty;
+
+        [StringLength(500)]
+        public string Descripcion { get; set; } = string.Empty;
+
+        public bool Activo { get; set; } = true;
+
+        [Required]
+        [StringLength(255)]
+        public string LastModifiedBy { get; set; } = string.Empty;
+
+        [Required]
+        public DateTime LastModifiedAt { get; set; } = DateTime.Now;
+
+        // Relaciones
+        public virtual ICollection<Habitacion> Habitaciones { get; set; } = new List<Habitacion>();
     }
 }
