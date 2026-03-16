@@ -107,6 +107,12 @@ public class Program {
         builder.Services.AddScoped<IPagoService, PagoService>();
         builder.Services.AddScoped<IMetodoPagoService, MetodoPagoService>();
         builder.Services.AddScoped<IRegimenService, RegimenService>();
+
+        // Export Service
+        builder.Services.AddScoped<IExportService, ExportService>();
+
+        // Import Service
+        builder.Services.AddScoped<IImportService, ImportService>();
     }
 
     public static void RegisterAuthentication(WebApplicationBuilder builder)

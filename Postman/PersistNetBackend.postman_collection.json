@@ -1930,6 +1930,94 @@
           }
         }
       ]
+    },
+    {
+      "name": "Importar",
+      "item": [
+        {
+          "name": "Importar Archivo XML",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": ""
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/importar/xml",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "importar",
+                "xml"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Importar Contenido XML",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/xml"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<Root>\n  <Table name=\"Hotel\">\n    <Row>\n      <Id>1</Id>\n      <Name>Hotel Example</Name>\n      <Description>Descripción del hotel</Description>\n      <Address>Calle Principal 123</Address>\n      <Phone>+34-123-456-789</Phone>\n      <Email>hotel@example.com</Email>\n    </Row>\n  </Table>\n</Root>"
+            },
+            "url": {
+              "raw": "{{base_url}}/importar/xml/content",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "importar",
+                "xml",
+                "content"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Importar Tabla XML",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": ""
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/importar/xml/table/Hotel",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "importar",
+                "xml",
+                "table",
+                "Hotel"
+              ]
+            }
+          }
+        }
+      ]
     }
   ],
   "variable": [
