@@ -18,25 +18,36 @@ namespace persist_net_backend.Controllers
             _metodoPagoService = metodoPagoService;
         }
 
+        private MetodoPagoResponse MapToResponse(MetodoPago metodoPago)
+        {
+            return new MetodoPagoResponse
+            {
+                Id = metodoPago.Id,
+                Nombre = metodoPago.Nombre,
+                Descripcion = metodoPago.Descripcion,
+                Activo = metodoPago.Activo
+            };
+        }
+
         [HttpGet("{id}")]
-        public async Task<ActionResult<MetodoPago>> GetMetodoPago(int id)
+        public async Task<ActionResult<MetodoPagoResponse>> GetMetodoPago(int id)
         {
             var metodoPago = await _metodoPagoService.GetMetodoPagoByIdAsync(id);
             if (metodoPago == null)
                 return NotFound();
 
-            return Ok(metodoPago);
+            return Ok(MapToResponse(metodoPago));
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<MetodoPago>>> GetAllMetodosPago()
+        public async Task<ActionResult<IEnumerable<MetodoPagoResponse>>> GetAllMetodosPago()
         {
             var metodosPago = await _metodoPagoService.GetAllMetodosPagoAsync();
-            return Ok(metodosPago);
+            return Ok(metodosPago.Select(MapToResponse));
         }
 
         [HttpPost]
-        public async Task<ActionResult<MetodoPago>> CreateMetodoPago([FromBody] CreateMetodoPagoRequest metodoPago)
+        public async Task<ActionResult<MetodoPagoResponse>> CreateMetodoPago([FromBody] CreateMetodoPagoRequest metodoPago)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -47,7 +58,7 @@ namespace persist_net_backend.Controllers
                 Descripcion = metodoPago.Descripcion ?? string.Empty,
                 Activo = metodoPago.Activo
             });
-            return CreatedAtAction(nameof(GetMetodoPago), new { id = createdMetodoPago.Id }, createdMetodoPago);
+            return CreatedAtAction(nameof(GetMetodoPago), new { id = createdMetodoPago.Id }, MapToResponse(createdMetodoPago));
         }
 
         [HttpPut("{id}")]

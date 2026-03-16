@@ -18,25 +18,36 @@ namespace persist_net_backend.Controllers
             _temporadaService = temporadaService;
         }
 
+        private TemporadaResponse MapToResponse(Temporada temporada)
+        {
+            return new TemporadaResponse
+            {
+                Id = temporada.Id,
+                Nombre = temporada.Nombre,
+                FechaInicio = temporada.FechaInicio,
+                FechaFin = temporada.FechaFin
+            };
+        }
+
         [HttpGet("{id}")]
-        public async Task<ActionResult<Temporada>> GetTemporada(int id)
+        public async Task<ActionResult<TemporadaResponse>> GetTemporada(int id)
         {
             var temporada = await _temporadaService.GetTemporadaByIdAsync(id);
             if (temporada == null)
                 return NotFound();
 
-            return Ok(temporada);
+            return Ok(MapToResponse(temporada));
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Temporada>>> GetAllTemporadas()
+        public async Task<ActionResult<IEnumerable<TemporadaResponse>>> GetAllTemporadas()
         {
             var temporadas = await _temporadaService.GetAllTemporadasAsync();
-            return Ok(temporadas);
+            return Ok(temporadas.Select(MapToResponse));
         }
 
         [HttpPost]
-        public async Task<ActionResult<Temporada>> CreateTemporada([FromBody] CreateTemporadaRequest temporada)
+        public async Task<ActionResult<TemporadaResponse>> CreateTemporada([FromBody] CreateTemporadaRequest temporada)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -49,7 +60,7 @@ namespace persist_net_backend.Controllers
                 LastModifiedBy = "system",
                 LastModifiedAt = DateTime.Now
             });
-            return CreatedAtAction(nameof(GetTemporada), new { id = createdTemporada.Id }, createdTemporada);
+            return CreatedAtAction(nameof(GetTemporada), new { id = createdTemporada.Id }, MapToResponse(createdTemporada));
         }
 
         [HttpPut("{id}")]

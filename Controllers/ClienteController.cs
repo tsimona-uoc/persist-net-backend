@@ -18,25 +18,39 @@ namespace persist_net_backend.Controllers
             _clienteService = clienteService;
         }
 
+        private ClienteResponse MapToResponse(Cliente cliente)
+        {
+            return new ClienteResponse
+            {
+                Id = cliente.Id,
+                Nombre = cliente.Nombre,
+                Apellido = cliente.Apellido,
+                Documentacion = cliente.Documentacion,
+                Telefono = cliente.Telefono,
+                Email = cliente.Email,
+                FechaRegistro = cliente.FechaRegistro
+            };
+        }
+
         [HttpGet("{id}")]
-        public async Task<ActionResult<Cliente>> GetCliente(int id)
+        public async Task<ActionResult<ClienteResponse>> GetCliente(int id)
         {
             var cliente = await _clienteService.GetClienteByIdAsync(id);
             if (cliente == null)
                 return NotFound();
 
-            return Ok(cliente);
+            return Ok(MapToResponse(cliente));
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Cliente>>> GetAllClientes()
+        public async Task<ActionResult<IEnumerable<ClienteResponse>>> GetAllClientes()
         {
             var clientes = await _clienteService.GetAllClientesAsync();
-            return Ok(clientes);
+            return Ok(clientes.Select(MapToResponse));
         }
 
         [HttpPost]
-        public async Task<ActionResult<Cliente>> CreateCliente([FromBody] CreateClientRequest cliente)
+        public async Task<ActionResult<ClienteResponse>> CreateCliente([FromBody] CreateClientRequest cliente)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -52,7 +66,7 @@ namespace persist_net_backend.Controllers
                 LastModifiedAt = DateTime.Now
             });
 
-            return CreatedAtAction(nameof(GetCliente), new { id = createdCliente.Id }, createdCliente);
+            return CreatedAtAction(nameof(GetCliente), new { id = createdCliente.Id }, MapToResponse(createdCliente));
         }
 
         [HttpPut("{id}")]

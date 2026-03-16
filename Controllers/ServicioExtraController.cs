@@ -18,25 +18,36 @@ namespace persist_net_backend.Controllers
             _servicioExtraService = servicioExtraService;
         }
 
+        private ServicioExtraResponse MapToResponse(ServicioExtra servicioExtra)
+        {
+            return new ServicioExtraResponse
+            {
+                Id = servicioExtra.Id,
+                Nombre = servicioExtra.Nombre,
+                Descripcion = servicioExtra.Descripcion,
+                PrecioBase = servicioExtra.PrecioBase
+            };
+        }
+
         [HttpGet("{id}")]
-        public async Task<ActionResult<ServicioExtra>> GetServicioExtra(int id)
+        public async Task<ActionResult<ServicioExtraResponse>> GetServicioExtra(int id)
         {
             var servicioExtra = await _servicioExtraService.GetServicioExtraByIdAsync(id);
             if (servicioExtra == null)
                 return NotFound();
 
-            return Ok(servicioExtra);
+            return Ok(MapToResponse(servicioExtra));
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ServicioExtra>>> GetAllServiciosExtra()
+        public async Task<ActionResult<IEnumerable<ServicioExtraResponse>>> GetAllServiciosExtra()
         {
             var serviciosExtra = await _servicioExtraService.GetAllServiciosExtraAsync();
-            return Ok(serviciosExtra);
+            return Ok(serviciosExtra.Select(MapToResponse));
         }
 
         [HttpPost]
-        public async Task<ActionResult<ServicioExtra>> CreateServicioExtra([FromBody] CreateServicioExtraRequest servicioExtra)
+        public async Task<ActionResult<ServicioExtraResponse>> CreateServicioExtra([FromBody] CreateServicioExtraRequest servicioExtra)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -49,7 +60,7 @@ namespace persist_net_backend.Controllers
                 LastModifiedBy = "system",
                 LastModifiedAt = DateTime.Now
             });
-            return CreatedAtAction(nameof(GetServicioExtra), new { id = createdServicioExtra.Id }, createdServicioExtra);
+            return CreatedAtAction(nameof(GetServicioExtra), new { id = createdServicioExtra.Id }, MapToResponse(createdServicioExtra));
         }
 
         [HttpPut("{id}")]

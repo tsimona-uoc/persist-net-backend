@@ -18,25 +18,35 @@ namespace persist_net_backend.Controllers
             _tipoHabitacionService = tipoHabitacionService;
         }
 
+        private TipoHabitacionResponse MapToResponse(TipoHabitacion tipoHabitacion)
+        {
+            return new TipoHabitacionResponse
+            {
+                Id = tipoHabitacion.Id,
+                Nombre = tipoHabitacion.Nombre,
+                Descripcion = tipoHabitacion.Descripcion
+            };
+        }
+
         [HttpGet("{id}")]
-        public async Task<ActionResult<TipoHabitacion>> GetTipoHabitacion(int id)
+        public async Task<ActionResult<TipoHabitacionResponse>> GetTipoHabitacion(int id)
         {
             var tipoHabitacion = await _tipoHabitacionService.GetTipoHabitacionByIdAsync(id);
             if (tipoHabitacion == null)
                 return NotFound();
 
-            return Ok(tipoHabitacion);
+            return Ok(MapToResponse(tipoHabitacion));
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<TipoHabitacion>>> GetAllTiposHabitacion()
+        public async Task<ActionResult<IEnumerable<TipoHabitacionResponse>>> GetAllTiposHabitacion()
         {
             var tiposHabitacion = await _tipoHabitacionService.GetAllTiposHabitacionAsync();
-            return Ok(tiposHabitacion);
+            return Ok(tiposHabitacion.Select(MapToResponse));
         }
 
         [HttpPost]
-        public async Task<ActionResult<TipoHabitacion>> CreateTipoHabitacion([FromBody] CreateTipoHabitacionRequest tipoHabitacion)
+        public async Task<ActionResult<TipoHabitacionResponse>> CreateTipoHabitacion([FromBody] CreateTipoHabitacionRequest tipoHabitacion)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -48,7 +58,7 @@ namespace persist_net_backend.Controllers
                 LastModifiedBy = "system",
                 LastModifiedAt = DateTime.Now
             });
-            return CreatedAtAction(nameof(GetTipoHabitacion), new { id = createdTipoHabitacion.Id }, createdTipoHabitacion);
+            return CreatedAtAction(nameof(GetTipoHabitacion), new { id = createdTipoHabitacion.Id }, MapToResponse(createdTipoHabitacion));
         }
 
         [HttpPut("{id}")]

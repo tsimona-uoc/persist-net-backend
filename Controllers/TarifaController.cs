@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using persist_net_backend.DTOs.Tarifa;
+using persist_net_backend.DTOs.Temporada;
 using persist_net_backend.Models;
 using persist_net_backend.Services;
 
@@ -18,25 +19,46 @@ namespace persist_net_backend.Controllers
             _tarifaService = tarifaService;
         }
 
+        private TemporadaResponse MapTemporadaToResponse(Temporada temporada)
+        {
+            return new TemporadaResponse
+            {
+                Id = temporada.Id,
+                Nombre = temporada.Nombre,
+                FechaInicio = temporada.FechaInicio,
+                FechaFin = temporada.FechaFin
+            };
+        }
+
+        private TarifaResponse MapToResponse(Tarifa tarifa)
+        {
+            return new TarifaResponse
+            {
+                Id = tarifa.Id,
+                PrecioNoche = tarifa.PrecioNoche,
+                Temporada = tarifa.Temporada != null ? MapTemporadaToResponse(tarifa.Temporada) : throw new InvalidOperationException("Temporada is required")
+            };
+        }
+
         [HttpGet("{id}")]
-        public async Task<ActionResult<Tarifa>> GetTarifa(int id)
+        public async Task<ActionResult<TarifaResponse>> GetTarifa(int id)
         {
             var tarifa = await _tarifaService.GetTarifaByIdAsync(id);
             if (tarifa == null)
                 return NotFound();
 
-            return Ok(tarifa);
+            return Ok(MapToResponse(tarifa));
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Tarifa>>> GetAllTarifas()
+        public async Task<ActionResult<IEnumerable<TarifaResponse>>> GetAllTarifas()
         {
             var tarifas = await _tarifaService.GetAllTarifasAsync();
-            return Ok(tarifas);
+            return Ok(tarifas.Select(MapToResponse));
         }
 
         [HttpPost]
-        public async Task<ActionResult<Tarifa>> CreateTarifa([FromBody] CreateTarifaRequest tarifa)
+        public async Task<ActionResult<TarifaResponse>> CreateTarifa([FromBody] CreateTarifaRequest tarifa)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -48,7 +70,7 @@ namespace persist_net_backend.Controllers
                 LastModifiedBy = "system",
                 LastModifiedAt = DateTime.Now
             });
-            return CreatedAtAction(nameof(GetTarifa), new { id = createdTarifa.Id }, createdTarifa);
+            return CreatedAtAction(nameof(GetTarifa), new { id = createdTarifa.Id }, MapToResponse(createdTarifa));
         }
 
         [HttpPut("{id}")]

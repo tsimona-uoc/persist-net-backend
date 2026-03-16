@@ -39,6 +39,7 @@ public class Program {
 
         builder.Services.AddDbContext<AppDbContext>(options => {
             options.UseSqlServer(connectionString, x => x.MigrationsAssembly("persist_net_backend"));
+            options.UseLazyLoadingProxies();
         });
 
         #endregion

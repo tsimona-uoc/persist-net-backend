@@ -18,25 +18,38 @@ namespace persist_net_backend.Controllers
             _hotelService = hotelService;
         }
 
+        private HotelResponse MapToResponse(Hotel hotel)
+        {
+            return new HotelResponse
+            {
+                Id = hotel.Id,
+                Name = hotel.Name,
+                Description = hotel.Description,
+                Address = hotel.Address,
+                PhoneNumber = hotel.PhoneNumber,
+                Email = hotel.Email
+            };
+        }
+
         [HttpGet("{id}")]
-        public async Task<ActionResult<Hotel>> GetHotel(int id)
+        public async Task<ActionResult<HotelResponse>> GetHotel(int id)
         {
             var hotel = await _hotelService.GetHotelByIdAsync(id);
             if (hotel == null)
                 return NotFound();
 
-            return Ok(hotel);
+            return Ok(MapToResponse(hotel));
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Hotel>>> GetAllHotels()
+        public async Task<ActionResult<IEnumerable<HotelResponse>>> GetAllHotels()
         {
             var hotels = await _hotelService.GetAllHotelsAsync();
-            return Ok(hotels);
+            return Ok(hotels.Select(MapToResponse));
         }
 
         [HttpPost]
-        public async Task<ActionResult<Hotel>> CreateHotel([FromBody] CreateHotelRequest hotel)
+        public async Task<ActionResult<HotelResponse>> CreateHotel([FromBody] CreateHotelRequest hotel)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -51,7 +64,7 @@ namespace persist_net_backend.Controllers
                 LastModifiedBy = "system",
                 LastModifiedAt = DateTime.Now
             });
-            return CreatedAtAction(nameof(GetHotel), new { id = createdHotel.Id }, createdHotel);
+            return CreatedAtAction(nameof(GetHotel), new { id = createdHotel.Id }, MapToResponse(createdHotel));
         }
 
         [HttpPut("{id}")]

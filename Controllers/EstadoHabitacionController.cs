@@ -18,25 +18,36 @@ namespace persist_net_backend.Controllers
             _estadoHabitacionService = estadoHabitacionService;
         }
 
+        private EstadoHabitacionResponse MapToResponse(EstadoHabitacion estado)
+        {
+            return new EstadoHabitacionResponse
+            {
+                Id = estado.Id,
+                Nombre = estado.Nombre,
+                Descripcion = estado.Descripcion,
+                Activo = estado.Activo
+            };
+        }
+
         [HttpGet("{id}")]
-        public async Task<ActionResult<EstadoHabitacion>> GetById(int id)
+        public async Task<ActionResult<EstadoHabitacionResponse>> GetById(int id)
         {
             var estado = await _estadoHabitacionService.GetEstadoHabitacionByIdAsync(id);
             if (estado == null)
                 return NotFound();
 
-            return Ok(estado);
+            return Ok(MapToResponse(estado));
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<EstadoHabitacion>>> GetAll()
+        public async Task<ActionResult<IEnumerable<EstadoHabitacionResponse>>> GetAll()
         {
             var estados = await _estadoHabitacionService.GetAllEstadosHabitacionAsync();
-            return Ok(estados);
+            return Ok(estados.Select(MapToResponse));
         }
 
         [HttpPost]
-        public async Task<ActionResult<EstadoHabitacion>> Create([FromBody] CreateEstadoHabitacionRequest request)
+        public async Task<ActionResult<EstadoHabitacionResponse>> Create([FromBody] CreateEstadoHabitacionRequest request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -50,7 +61,7 @@ namespace persist_net_backend.Controllers
                 LastModifiedBy = "system"
             });
 
-            return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
+            return CreatedAtAction(nameof(GetById), new { id = created.Id }, MapToResponse(created));
         }
 
         [HttpPut("{id}")]
