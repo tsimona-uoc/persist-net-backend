@@ -17,12 +17,15 @@ namespace persist_net_backend.Data
         // Entidades de gestión hotelera
         public DbSet<Hotel> Hotels { get; set; } = null!;
         public DbSet<TipoHabitacion> TiposHabitacion { get; set; } = null!;
+        public DbSet<EstadoHabitacion> EstadosHabitacion { get; set; } = null!;
         public DbSet<Habitacion> Habitaciones { get; set; } = null!;
         public DbSet<Cliente> Clientes { get; set; } = null!;
         public DbSet<Temporada> Temporadas { get; set; } = null!;
         public DbSet<Tarifa> Tarifas { get; set; } = null!;
         public DbSet<Reserva> Reservas { get; set; } = null!;
+        public DbSet<EstadoReserva> EstadosReserva { get; set; } = null!;
         public DbSet<Estancia> Estancias { get; set; } = null!;
+        public DbSet<EstadoEstancia> EstadosEstancia { get; set; } = null!;
         public DbSet<ServicioExtra> ServiciosExtra { get; set; } = null!;
         public DbSet<ConsumoExtra> ConsumosExtra { get; set; } = null!;
         public DbSet<Factura> Facturas { get; set; } = null!;

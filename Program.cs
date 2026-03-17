@@ -75,6 +75,9 @@ public class Program {
         builder.Services.AddScoped<IEstadoHabitacionRepository, EstadoHabitacionRepository>();
         builder.Services.AddScoped<IEstadoReservaRepository, EstadoReservaRepository>();
         builder.Services.AddScoped<IEstadoEstanciaRepository, EstadoEstanciaRepository>();
+
+        // Export Repository
+        builder.Services.AddScoped<IExportRepository, ExportRepository>();
     }
 
     public static void RegisterServices(WebApplicationBuilder builder)
@@ -105,10 +108,11 @@ public class Program {
         builder.Services.AddScoped<IMetodoPagoService, MetodoPagoService>();
         builder.Services.AddScoped<IRegimenService, RegimenService>();
 
-        // Lookup / Parametric Services
-        builder.Services.AddScoped<IEstadoHabitacionService, EstadoHabitacionService>();
-        builder.Services.AddScoped<IEstadoReservaService, EstadoReservaService>();
-        builder.Services.AddScoped<IEstadoEstanciaService, EstadoEstanciaService>();
+        // Export Service
+        builder.Services.AddScoped<IExportService, ExportService>();
+
+        // Import Service
+        builder.Services.AddScoped<IImportService, ImportService>();
     }
 
     public static void RegisterAuthentication(WebApplicationBuilder builder)
