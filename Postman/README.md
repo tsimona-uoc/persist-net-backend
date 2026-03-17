@@ -4,11 +4,12 @@ Colección completa de Postman con todos los endpoints de la API REST del sistem
 
 ## 📋 Contenido
 
-- **13 carpetas de API** con operaciones CRUD
-- **50+ endpoints** configurados
+- **14 carpetas de API** con operaciones CRUD
+- **55+ endpoints** configurados (+ 5 de exportación)
 - **Autenticación JWT** automática
 - **Variables de entorno** preconfigu­radas
 - **Scripts de test y validación**
+- **Exportar datos** en XML y JSON
 
 ## 🚀 Instalación
 
@@ -40,7 +41,7 @@ Ve a **Environments** → **Persist.NET - Development** y verifica:
 
 | Variable | Valor | Descripción |
 |----------|-------|-------------|
-| `base_url` | `https://localhost:7170/api` | URL base de la API |
+| `base_url` | `https://localhost:7151/api` | URL base de la API |
 | `email` | `admin@persist.net` | Email para login |
 | `password` | `Admin@123456` | Contraseña para login |
 | `jwt_token` | (se auto-llena) | Token JWT (se obtiene al login) |
@@ -48,8 +49,9 @@ Ve a **Environments** → **Persist.NET - Development** y verifica:
 ### Paso 3: Ajustar si es necesario
 
 Si tu API está en otra URL/puerto, edita `base_url`:
-- Local: `https://localhost:7170/api`
+- Local: `https://localhost:7151/api`
 - Otro puerto: `https://localhost:XXXX/api`
+- IP local: `https://192.168.x.x:7151/api`
 - Remoto: `https://api.tudominio.com`
 
 ## 📲 Cómo usar
@@ -82,7 +84,7 @@ El token se envía automáticamente.
 Puedes usar variables en tu ambiente:
 
 ```
-{{base_url}}    → https://localhost:7170/api
+{{base_url}}    → https://localhost:7151/api
 {{jwt_token}}   → Token JWT actual
 {{hotel_id}}    → 1
 {{cliente_id}}  → 1
@@ -119,6 +121,13 @@ Facturas             (incluye GET por cliente)
 Pagos                (incluye GET por factura)
 Servicios Extra
 Estancias            (incluye GET por reserva)
+
+Exportar
+├── Exportar Todo a XML (Descarga) → GET /exportar/xml
+├── Exportar Tabla a XML           → GET /exportar/xml/{tableName}
+├── Exportar Todo a JSON (Descarga)→ GET /exportar/json
+├── Vista Previa XML               → GET /exportar/preview/xml
+└── Vista Previa JSON              → GET /exportar/preview/json
 ```
 
 ## 🧪 Tests Automáticos
@@ -233,9 +242,78 @@ GET /reserva/cliente/:clienteId     → Sus reservas
 GET /factura/cliente/:clienteId     → Sus facturas
 ```
 
+## � Exportar Datos
+
+### Exportar TODO a XML (Descargable)
+
+```
+GET /api/exportar/xml
+```
+
+Descarga un archivo XML con todas las tablas y datos. Útil para backups e integraciones.
+
+**Respuesta:** Archivo `export_yyyyMMdd_HHmmss.xml`
+
+### Exportar una Tabla específica a XML
+
+```
+GET /api/exportar/xml/{tableName}
+```
+
+Ejemplo:
+```
+GET /api/exportar/xml/Hotels
+GET /api/exportar/xml/Clientes
+GET /api/exportar/xml/Reservas
+```
+
+**Respuesta:** Archivo XML con solo esa tabla.
+
+### Exportar TODO a JSON (Descargable)
+
+```
+GET /api/exportar/json
+```
+
+Descarga un archivo JSON con estructura organizada por tablas.
+
+**Respuesta:** Archivo `export_yyyyMMdd_HHmmss.json`
+
+### Ver el XML en pantalla (No descarga)
+
+```
+GET /api/exportar/preview/xml
+```
+
+Muestra el XML formateado en la respuesta sin descargar archivo.
+
+### Ver el JSON en pantalla (No descarga)
+
+```
+GET /api/exportar/preview/json
+```
+
+Muestra el JSON formateado en la respuesta sin descargar archivo.
+
+**Estructura XML de ejemplo:**
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<Database ExportedAt="2026-03-15 14:30:00" Tables="19">
+  <Table Name="Hotels" Rows="3">
+    <Row>
+      <Column Name="Id">1</Column>
+      <Column Name="Name">Hotel SolMar</Column>
+      <Column Name="Description">Hotel 4 estrellas</Column>
+      ...
+    </Row>
+  </Table>
+  ...
+</Database>
+```
+
 ## 📖 Documentación API
 
-Swagger/OpenAPI: `https://localhost:7170/swagger`
+Swagger/OpenAPI: `https://localhost:7151/swagger`
 
 ## 🤝 Support
 

@@ -34,6 +34,6 @@ namespace persist_net_backend.Models
         [Required]
         public DateTime LastModifiedAt { get; set; } = DateTime.Now;
 
-        public User? User { get; set; }
+        public virtual User? User { get; set; }
     }
 }

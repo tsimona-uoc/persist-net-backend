@@ -18,7 +18,8 @@ namespace persist_net_backend.Models
         public DateTime? FechaCheckOut { get; set; }
 
         [Required]
-        public EstadoEstanciaEnum Estado { get; set; } = EstadoEstanciaEnum.ACTIVA;
+        [ForeignKey("EstadoEstancia")]
+        public int EstadoEstanciaId { get; set; }
 
         [Required]
         [StringLength(255)]
@@ -28,8 +29,9 @@ namespace persist_net_backend.Models
         public DateTime LastModifiedAt { get; set; } = DateTime.Now;
 
         // Relaciones
-        public Reserva? Reserva { get; set; }
-        public ICollection<ConsumoExtra> ConsumosExtra { get; set; } = new List<ConsumoExtra>();
-        public ICollection<Factura> Facturas { get; set; } = new List<Factura>();
+        public virtual Reserva? Reserva { get; set; }
+        public virtual EstadoEstancia? EstadoEstancia { get; set; }
+        public virtual ICollection<ConsumoExtra> ConsumosExtra { get; set; } = new List<ConsumoExtra>();
+        public virtual ICollection<Factura> Facturas { get; set; } = new List<Factura>();
     }
 }

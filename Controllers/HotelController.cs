@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using persist_net_backend.DTOs.Hotel;
 using persist_net_backend.Models;
 using persist_net_backend.Services;
 
@@ -17,39 +18,58 @@ namespace persist_net_backend.Controllers
             _hotelService = hotelService;
         }
 
+        private HotelResponse MapToResponse(Hotel hotel)
+        {
+            return new HotelResponse
+            {
+                Id = hotel.Id,
+                Name = hotel.Name,
+                Description = hotel.Description,
+                Address = hotel.Address,
+                PhoneNumber = hotel.PhoneNumber,
+                Email = hotel.Email
+            };
+        }
+
         [HttpGet("{id}")]
-        public async Task<ActionResult<Hotel>> GetHotel(int id)
+        public async Task<ActionResult<HotelResponse>> GetHotel(int id)
         {
             var hotel = await _hotelService.GetHotelByIdAsync(id);
             if (hotel == null)
                 return NotFound();
 
-            return Ok(hotel);
+            return Ok(MapToResponse(hotel));
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Hotel>>> GetAllHotels()
+        public async Task<ActionResult<IEnumerable<HotelResponse>>> GetAllHotels()
         {
             var hotels = await _hotelService.GetAllHotelsAsync();
-            return Ok(hotels);
+            return Ok(hotels.Select(MapToResponse));
         }
 
         [HttpPost]
-        public async Task<ActionResult<Hotel>> CreateHotel([FromBody] Hotel hotel)
+        public async Task<ActionResult<HotelResponse>> CreateHotel([FromBody] CreateHotelRequest hotel)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var createdHotel = await _hotelService.CreateHotelAsync(hotel);
-            return CreatedAtAction(nameof(GetHotel), new { id = createdHotel.Id }, createdHotel);
+            var createdHotel = await _hotelService.CreateHotelAsync(new Hotel
+            {
+                Name = hotel.Name,
+                Description = hotel.Description ?? string.Empty,
+                Address = hotel.Address ?? string.Empty,
+                PhoneNumber = hotel.PhoneNumber ?? string.Empty,
+                Email = hotel.Email ?? string.Empty,
+                LastModifiedBy = "system",
+                LastModifiedAt = DateTime.Now
+            });
+            return CreatedAtAction(nameof(GetHotel), new { id = createdHotel.Id }, MapToResponse(createdHotel));
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateHotel(int id, [FromBody] Hotel hotel)
+        public async Task<IActionResult> UpdateHotel(int id, [FromBody] UpdateHotelRequest hotel)
         {
-            if (id != hotel.Id)
-                return BadRequest("ID mismatch");
-
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
@@ -57,7 +77,15 @@ namespace persist_net_backend.Controllers
             if (existingHotel == null)
                 return NotFound();
 
-            await _hotelService.UpdateHotelAsync(hotel);
+            existingHotel.Name = hotel.Name ?? existingHotel.Name;
+            existingHotel.Description = hotel.Description ?? existingHotel.Description;
+            existingHotel.Address = hotel.Address ?? existingHotel.Address;
+            existingHotel.PhoneNumber = hotel.PhoneNumber ?? existingHotel.PhoneNumber;
+            existingHotel.Email = hotel.Email ?? existingHotel.Email;
+            existingHotel.LastModifiedBy = "system";
+            existingHotel.LastModifiedAt = DateTime.Now;
+
+            await _hotelService.UpdateHotelAsync(existingHotel);
             return NoContent();
         }
 
