@@ -102,6 +102,11 @@ public class Program {
         builder.Services.AddScoped<IServicioExtraService, ServicioExtraService>();
         builder.Services.AddScoped<IConsumoExtraService, ConsumoExtraService>();
 
+        // Lookup / Parametric Services
+        builder.Services.AddScoped<IEstadoHabitacionService, EstadoHabitacionService>();
+        builder.Services.AddScoped<IEstadoReservaService, EstadoReservaService>();
+        builder.Services.AddScoped<IEstadoEstanciaService, EstadoEstanciaService>();
+
         // Invoice and Payment Services
         builder.Services.AddScoped<IFacturaService, FacturaService>();
         builder.Services.AddScoped<IPagoService, PagoService>();
