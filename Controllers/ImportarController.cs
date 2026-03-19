@@ -36,6 +36,10 @@ namespace persist_net_backend.Controllers
                     return Ok(result);
                 }
             }
+            catch (System.Xml.XmlException xmlEx)
+            {
+                return BadRequest(new { error = "Error de formato en el documento XML: " + xmlEx.Message });
+            }
             catch (Exception ex)
             {
                 return BadRequest(new { error = ex.Message });
@@ -63,6 +67,10 @@ namespace persist_net_backend.Controllers
                     return Ok(result);
                 }
             }
+            catch (System.Xml.XmlException xmlEx)
+            {
+                return BadRequest(new { error = "El XML proporcionado tiene errores de sintaxis: " + xmlEx.Message });
+            }
             catch (Exception ex)
             {
                 return BadRequest(new { error = ex.Message });
@@ -89,6 +97,10 @@ namespace persist_net_backend.Controllers
                     var result = await _importService.ImportTableFromXmlAsync(tableName, xmlContent);
                     return Ok(result);
                 }
+            }
+            catch (System.Xml.XmlException xmlEx)
+            {
+                return BadRequest(new { error = $"Error al leer el XML para la tabla {tableName}: " + xmlEx.Message });
             }
             catch (Exception ex)
             {
