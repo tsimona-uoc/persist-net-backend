@@ -32,6 +32,10 @@ namespace persist_net_backend.Controllers
                 using (var reader = new StreamReader(file.OpenReadStream()))
                 {
                     var xmlContent = await reader.ReadToEndAsync();
+
+                    // Validación para interceptar errores antes de pasarlo al servicio
+                    new System.Xml.XmlDocument().LoadXml(xmlContent);
+
                     var result = await _importService.ImportFromXmlAsync(xmlContent);
                     return Ok(result);
                 }
@@ -62,6 +66,9 @@ namespace persist_net_backend.Controllers
                     
                     if (string.IsNullOrEmpty(xmlContent))
                         return BadRequest(new { error = "El contenido XML no puede estar vacío" });
+
+                    // Validación estructural rápida
+                    new System.Xml.XmlDocument().LoadXml(xmlContent);
 
                     var result = await _importService.ImportFromXmlAsync(xmlContent);
                     return Ok(result);
@@ -94,6 +101,10 @@ namespace persist_net_backend.Controllers
                 using (var reader = new StreamReader(file.OpenReadStream()))
                 {
                     var xmlContent = await reader.ReadToEndAsync();
+
+                    // Validación estructural rápida
+                    new System.Xml.XmlDocument().LoadXml(xmlContent);
+
                     var result = await _importService.ImportTableFromXmlAsync(tableName, xmlContent);
                     return Ok(result);
                 }
