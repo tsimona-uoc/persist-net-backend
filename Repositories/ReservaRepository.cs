@@ -45,6 +45,15 @@ namespace persist_net_backend.Repositories
                 .ToListAsync();
         }
 
+        public async Task<bool> HasOverlappingReservationAsync(int habitacionId, DateOnly fechaEntrada, DateOnly fechaSalida, int? excludeReservaId = null)
+        {
+            return await _context.Reservas.AnyAsync(r =>
+                r.HabitacionId == habitacionId &&
+                (!excludeReservaId.HasValue || r.Id != excludeReservaId.Value) &&
+                fechaEntrada < r.FechaSalida &&
+                fechaSalida > r.FechaEntrada);
+        }
+
         public async Task<Reserva> AddAsync(Reserva reserva)
         {
             _context.Reservas.Add(reserva);

@@ -115,6 +115,10 @@ namespace persist_net_backend.Controllers
             {
                 return BadRequest(new { error = ex.Message });
             }
+            catch (ReservaValidationException ex)
+            {
+                return Conflict(new { error = ex.Message });
+            }
         }
 
         [HttpPut("{id}")]
@@ -136,8 +140,19 @@ namespace persist_net_backend.Controllers
             existingReserva.LastModifiedBy = "system";
             existingReserva.LastModifiedAt = DateTime.Now;
 
-            await _reservaService.UpdateReservaAsync(existingReserva);
-            return NoContent();
+            try
+            {
+                await _reservaService.UpdateReservaAsync(existingReserva);
+                return NoContent();
+            }
+            catch (EntityReferenceValidationException ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+            catch (ReservaValidationException ex)
+            {
+                return Conflict(new { error = ex.Message });
+            }
         }
 
         [HttpDelete("{id}")]

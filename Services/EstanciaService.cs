@@ -39,6 +39,9 @@ namespace persist_net_backend.Services
 
         public async Task<Estancia> UpdateEstanciaAsync(Estancia estancia)
         {
+            await _entityReferenceValidator.EnsureExistsAsync<Reserva>(estancia.ReservaId, "Reserva");
+            await _entityReferenceValidator.EnsureExistsAsync<EstadoEstancia>(estancia.EstadoEstanciaId, "Estado de estancia");
+
             return await _estanciaRepository.UpdateAsync(estancia);
         }
 

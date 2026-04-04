@@ -102,17 +102,22 @@ namespace persist_net_backend.Controllers
             if (existingEstancia == null)
                 return NotFound();
 
-            await _estanciaService.UpdateEstanciaAsync(new Estancia
+            existingEstancia.ReservaId = estancia.ReservaId ?? existingEstancia.ReservaId;
+            existingEstancia.FechaCheckIn = estancia.FechaCheckIn ?? existingEstancia.FechaCheckIn;
+            existingEstancia.FechaCheckOut = estancia.FechaCheckOut ?? existingEstancia.FechaCheckOut;
+            existingEstancia.EstadoEstanciaId = estancia.EstadoEstanciaId ?? existingEstancia.EstadoEstanciaId;
+            existingEstancia.LastModifiedBy = "system";
+            existingEstancia.LastModifiedAt = DateTime.Now;
+
+            try
             {
-                Id = id,
-                ReservaId = estancia.ReservaId ?? existingEstancia.ReservaId,
-                FechaCheckIn = estancia.FechaCheckIn ?? existingEstancia.FechaCheckIn,
-                FechaCheckOut = estancia.FechaCheckOut ?? existingEstancia.FechaCheckOut,
-                EstadoEstanciaId = estancia.EstadoEstanciaId ?? existingEstancia.EstadoEstanciaId,
-                LastModifiedBy = "system",
-                LastModifiedAt = DateTime.Now
-            });
-            return NoContent();
+                await _estanciaService.UpdateEstanciaAsync(existingEstancia);
+                return NoContent();
+            }
+            catch (EntityReferenceValidationException ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
         }
 
         [HttpDelete("{id}")]
