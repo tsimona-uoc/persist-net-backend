@@ -25,6 +25,13 @@ namespace persist_net_backend.Repositories
                 .FirstOrDefaultAsync(e => e.Id == id);
         }
 
+        public async Task<Estancia?> GetByIdNoTrackingAsync(int id)
+        {
+            return await QueryWithRelations()
+                .AsNoTracking()
+                .FirstOrDefaultAsync(e => e.Id == id);
+        }
+
         public async Task<IEnumerable<Estancia>> GetAllAsync()
         {
             return await QueryWithRelations().ToListAsync();
@@ -35,6 +42,15 @@ namespace persist_net_backend.Repositories
             return await QueryWithRelations()
                 .Where(e => e.ReservaId == reservaId)
                 .ToListAsync();
+        }
+
+        public async Task<bool> HasActiveEstanciaByHabitacionIdAsync(int habitacionId, int? excludeEstanciaId = null)
+        {
+            return await _context.Estancias.AnyAsync(e =>
+                e.Reserva != null &&
+                e.Reserva.HabitacionId == habitacionId &&
+                (!excludeEstanciaId.HasValue || e.Id != excludeEstanciaId.Value) &&
+                (e.FechaCheckOut == null || (e.EstadoEstancia != null && e.EstadoEstancia.Nombre.ToUpper() == "ACTIVA")));
         }
 
         public async Task<Estancia> AddAsync(Estancia estancia)
