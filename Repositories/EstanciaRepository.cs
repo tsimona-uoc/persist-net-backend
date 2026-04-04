@@ -13,19 +13,26 @@ namespace persist_net_backend.Repositories
             _context = context;
         }
 
+        private IQueryable<Estancia> QueryWithRelations()
+        {
+            return _context.Estancias
+                .Include(e => e.EstadoEstancia);
+        }
+
         public async Task<Estancia?> GetByIdAsync(int id)
         {
-            return await _context.Estancias.FindAsync(id);
+            return await QueryWithRelations()
+                .FirstOrDefaultAsync(e => e.Id == id);
         }
 
         public async Task<IEnumerable<Estancia>> GetAllAsync()
         {
-            return await _context.Estancias.ToListAsync();
+            return await QueryWithRelations().ToListAsync();
         }
 
         public async Task<IEnumerable<Estancia>> GetByReservaIdAsync(int reservaId)
         {
-            return await _context.Estancias
+            return await QueryWithRelations()
                 .Where(e => e.ReservaId == reservaId)
                 .ToListAsync();
         }
@@ -34,14 +41,18 @@ namespace persist_net_backend.Repositories
         {
             _context.Estancias.Add(estancia);
             await _context.SaveChangesAsync();
-            return estancia;
+
+            return await GetByIdAsync(estancia.Id)
+                ?? throw new InvalidOperationException("Could not load the created estancia.");
         }
 
         public async Task<Estancia> UpdateAsync(Estancia estancia)
         {
             _context.Estancias.Update(estancia);
             await _context.SaveChangesAsync();
-            return estancia;
+
+            return await GetByIdAsync(estancia.Id)
+                ?? throw new InvalidOperationException("Could not load the updated estancia.");
         }
 
         public async Task<bool> DeleteAsync(int id)

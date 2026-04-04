@@ -13,26 +13,34 @@ namespace persist_net_backend.Repositories
             _context = context;
         }
 
+        private IQueryable<Reserva> QueryWithRelations()
+        {
+            return _context.Reservas
+                .Include(r => r.Regimen)
+                .Include(r => r.EstadoReserva);
+        }
+
         public async Task<Reserva?> GetByIdAsync(int id)
         {
-            return await _context.Reservas.FindAsync(id);
+            return await QueryWithRelations()
+                .FirstOrDefaultAsync(r => r.Id == id);
         }
 
         public async Task<IEnumerable<Reserva>> GetAllAsync()
         {
-            return await _context.Reservas.ToListAsync();
+            return await QueryWithRelations().ToListAsync();
         }
 
         public async Task<IEnumerable<Reserva>> GetByClienteIdAsync(int clienteId)
         {
-            return await _context.Reservas
+            return await QueryWithRelations()
                 .Where(r => r.ClienteId == clienteId)
                 .ToListAsync();
         }
 
         public async Task<IEnumerable<Reserva>> GetByHabitacionIdAsync(int habitacionId)
         {
-            return await _context.Reservas
+            return await QueryWithRelations()
                 .Where(r => r.HabitacionId == habitacionId)
                 .ToListAsync();
         }
@@ -41,14 +49,18 @@ namespace persist_net_backend.Repositories
         {
             _context.Reservas.Add(reserva);
             await _context.SaveChangesAsync();
-            return reserva;
+
+            return await GetByIdAsync(reserva.Id)
+                ?? throw new InvalidOperationException("Could not load the created reserva.");
         }
 
         public async Task<Reserva> UpdateAsync(Reserva reserva)
         {
             _context.Reservas.Update(reserva);
             await _context.SaveChangesAsync();
-            return reserva;
+
+            return await GetByIdAsync(reserva.Id)
+                ?? throw new InvalidOperationException("Could not load the updated reserva.");
         }
 
         public async Task<bool> DeleteAsync(int id)

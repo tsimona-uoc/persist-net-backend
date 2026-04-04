@@ -13,19 +13,26 @@ namespace persist_net_backend.Repositories
             _context = context;
         }
 
+        private IQueryable<Pago> QueryWithRelations()
+        {
+            return _context.Pagos
+                .Include(p => p.MetodoPago);
+        }
+
         public async Task<Pago?> GetByIdAsync(int id)
         {
-            return await _context.Pagos.FindAsync(id);
+            return await QueryWithRelations()
+                .FirstOrDefaultAsync(p => p.Id == id);
         }
 
         public async Task<IEnumerable<Pago>> GetAllAsync()
         {
-            return await _context.Pagos.ToListAsync();
+            return await QueryWithRelations().ToListAsync();
         }
 
         public async Task<IEnumerable<Pago>> GetByFacturaIdAsync(int facturaId)
         {
-            return await _context.Pagos
+            return await QueryWithRelations()
                 .Where(p => p.FacturaId == facturaId)
                 .ToListAsync();
         }
@@ -34,14 +41,18 @@ namespace persist_net_backend.Repositories
         {
             _context.Pagos.Add(pago);
             await _context.SaveChangesAsync();
-            return pago;
+
+            return await GetByIdAsync(pago.Id)
+                ?? throw new InvalidOperationException("Could not load the created pago.");
         }
 
         public async Task<Pago> UpdateAsync(Pago pago)
         {
             _context.Pagos.Update(pago);
             await _context.SaveChangesAsync();
-            return pago;
+
+            return await GetByIdAsync(pago.Id)
+                ?? throw new InvalidOperationException("Could not load the updated pago.");
         }
 
         public async Task<bool> DeleteAsync(int id)

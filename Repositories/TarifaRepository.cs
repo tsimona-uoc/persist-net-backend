@@ -13,28 +13,39 @@ namespace persist_net_backend.Repositories
             _context = context;
         }
 
+        private IQueryable<Tarifa> QueryWithRelations()
+        {
+            return _context.Tarifas
+                .Include(t => t.Temporada);
+        }
+
         public async Task<Tarifa?> GetByIdAsync(int id)
         {
-            return await _context.Tarifas.FindAsync(id);
+            return await QueryWithRelations()
+                .FirstOrDefaultAsync(t => t.Id == id);
         }
 
         public async Task<IEnumerable<Tarifa>> GetAllAsync()
         {
-            return await _context.Tarifas.ToListAsync();
+            return await QueryWithRelations().ToListAsync();
         }
 
         public async Task<Tarifa> AddAsync(Tarifa tarifa)
         {
             _context.Tarifas.Add(tarifa);
             await _context.SaveChangesAsync();
-            return tarifa;
+
+            return await GetByIdAsync(tarifa.Id)
+                ?? throw new InvalidOperationException("Could not load the created tarifa.");
         }
 
         public async Task<Tarifa> UpdateAsync(Tarifa tarifa)
         {
             _context.Tarifas.Update(tarifa);
             await _context.SaveChangesAsync();
-            return tarifa;
+
+            return await GetByIdAsync(tarifa.Id)
+                ?? throw new InvalidOperationException("Could not load the updated tarifa.");
         }
 
         public async Task<bool> DeleteAsync(int id)

@@ -13,19 +13,26 @@ namespace persist_net_backend.Repositories
             _context = context;
         }
 
+        private IQueryable<ConsumoExtra> QueryWithRelations()
+        {
+            return _context.ConsumosExtra
+                .Include(c => c.ServicioExtra);
+        }
+
         public async Task<ConsumoExtra?> GetByIdAsync(int id)
         {
-            return await _context.ConsumosExtra.FindAsync(id);
+            return await QueryWithRelations()
+                .FirstOrDefaultAsync(c => c.Id == id);
         }
 
         public async Task<IEnumerable<ConsumoExtra>> GetAllAsync()
         {
-            return await _context.ConsumosExtra.ToListAsync();
+            return await QueryWithRelations().ToListAsync();
         }
 
         public async Task<IEnumerable<ConsumoExtra>> GetByEstanciaIdAsync(int estanciaId)
         {
-            return await _context.ConsumosExtra
+            return await QueryWithRelations()
                 .Where(c => c.EstanciaId == estanciaId)
                 .ToListAsync();
         }
@@ -34,14 +41,18 @@ namespace persist_net_backend.Repositories
         {
             _context.ConsumosExtra.Add(consumoExtra);
             await _context.SaveChangesAsync();
-            return consumoExtra;
+
+            return await GetByIdAsync(consumoExtra.Id)
+                ?? throw new InvalidOperationException("Could not load the created consumo extra.");
         }
 
         public async Task<ConsumoExtra> UpdateAsync(ConsumoExtra consumoExtra)
         {
             _context.ConsumosExtra.Update(consumoExtra);
             await _context.SaveChangesAsync();
-            return consumoExtra;
+
+            return await GetByIdAsync(consumoExtra.Id)
+                ?? throw new InvalidOperationException("Could not load the updated consumo extra.");
         }
 
         public async Task<bool> DeleteAsync(int id)
