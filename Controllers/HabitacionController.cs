@@ -118,7 +118,6 @@ namespace persist_net_backend.Controllers
             existingHabitacion.TipoHabitacionId = habitacion.TipoHabitacionId ?? existingHabitacion.TipoHabitacionId;
             existingHabitacion.Planta = habitacion.Planta ?? existingHabitacion.Planta;
             existingHabitacion.Numero = habitacion.Numero ?? existingHabitacion.Numero;
-            existingHabitacion.EstadoHabitacionId = habitacion.EstadoHabitacionId ?? existingHabitacion.EstadoHabitacionId;
             existingHabitacion.LastModifiedBy = "system";
             existingHabitacion.LastModifiedAt = DateTime.Now;
 

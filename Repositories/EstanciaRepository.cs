@@ -46,11 +46,14 @@ namespace persist_net_backend.Repositories
 
         public async Task<bool> HasActiveEstanciaByHabitacionIdAsync(int habitacionId, int? excludeEstanciaId = null)
         {
+            var now = DateTime.Now;
+
             return await _context.Estancias.AnyAsync(e =>
                 e.Reserva != null &&
                 e.Reserva.HabitacionId == habitacionId &&
                 (!excludeEstanciaId.HasValue || e.Id != excludeEstanciaId.Value) &&
-                (e.FechaCheckOut == null || (e.EstadoEstancia != null && e.EstadoEstancia.Nombre.ToUpper() == "ACTIVA")));
+                e.FechaCheckIn <= now &&
+                (e.FechaCheckOut == null || e.FechaCheckOut > now));
         }
 
         public async Task<Estancia> AddAsync(Estancia estancia)
