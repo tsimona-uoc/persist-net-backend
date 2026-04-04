@@ -6,10 +6,12 @@ namespace persist_net_backend.Services
     public class ReservaService : IReservaService
     {
         private readonly IReservaRepository _reservaRepository;
+        private readonly IEntityReferenceValidator _entityReferenceValidator;
 
-        public ReservaService(IReservaRepository reservaRepository)
+        public ReservaService(IReservaRepository reservaRepository, IEntityReferenceValidator entityReferenceValidator)
         {
             _reservaRepository = reservaRepository;
+            _entityReferenceValidator = entityReferenceValidator;
         }
 
         public async Task<Reserva?> GetReservaByIdAsync(int id)
@@ -34,6 +36,11 @@ namespace persist_net_backend.Services
 
         public async Task<Reserva> CreateReservaAsync(Reserva reserva)
         {
+            await _entityReferenceValidator.EnsureExistsAsync<Cliente>(reserva.ClienteId, "Cliente");
+            await _entityReferenceValidator.EnsureExistsAsync<Habitacion>(reserva.HabitacionId, "Habitacion");
+            await _entityReferenceValidator.EnsureExistsAsync<Regimen>(reserva.RegimenId, "Regimen");
+            await _entityReferenceValidator.EnsureExistsAsync<EstadoReserva>(reserva.EstadoReservaId, "Estado de reserva");
+
             return await _reservaRepository.AddAsync(reserva);
         }
 

@@ -6,10 +6,12 @@ namespace persist_net_backend.Services
     public class EstanciaService : IEstanciaService
     {
         private readonly IEstanciaRepository _estanciaRepository;
+        private readonly IEntityReferenceValidator _entityReferenceValidator;
 
-        public EstanciaService(IEstanciaRepository estanciaRepository)
+        public EstanciaService(IEstanciaRepository estanciaRepository, IEntityReferenceValidator entityReferenceValidator)
         {
             _estanciaRepository = estanciaRepository;
+            _entityReferenceValidator = entityReferenceValidator;
         }
 
         public async Task<Estancia?> GetEstanciaByIdAsync(int id)
@@ -29,6 +31,9 @@ namespace persist_net_backend.Services
 
         public async Task<Estancia> CreateEstanciaAsync(Estancia estancia)
         {
+            await _entityReferenceValidator.EnsureExistsAsync<Reserva>(estancia.ReservaId, "Reserva");
+            await _entityReferenceValidator.EnsureExistsAsync<EstadoEstancia>(estancia.EstadoEstanciaId, "Estado de estancia");
+
             return await _estanciaRepository.AddAsync(estancia);
         }
 

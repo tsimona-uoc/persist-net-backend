@@ -6,10 +6,12 @@ namespace persist_net_backend.Services
     public class ConsumoExtraService : IConsumoExtraService
     {
         private readonly IConsumoExtraRepository _consumoExtraRepository;
+        private readonly IEntityReferenceValidator _entityReferenceValidator;
 
-        public ConsumoExtraService(IConsumoExtraRepository consumoExtraRepository)
+        public ConsumoExtraService(IConsumoExtraRepository consumoExtraRepository, IEntityReferenceValidator entityReferenceValidator)
         {
             _consumoExtraRepository = consumoExtraRepository;
+            _entityReferenceValidator = entityReferenceValidator;
         }
 
         public async Task<ConsumoExtra?> GetConsumoExtraByIdAsync(int id)
@@ -29,6 +31,9 @@ namespace persist_net_backend.Services
 
         public async Task<ConsumoExtra> CreateConsumoExtraAsync(ConsumoExtra consumoExtra)
         {
+            await _entityReferenceValidator.EnsureExistsAsync<Estancia>(consumoExtra.EstanciaId, "Estancia");
+            await _entityReferenceValidator.EnsureExistsAsync<ServicioExtra>(consumoExtra.ServicioExtraId, "Servicio extra");
+
             return await _consumoExtraRepository.AddAsync(consumoExtra);
         }
 

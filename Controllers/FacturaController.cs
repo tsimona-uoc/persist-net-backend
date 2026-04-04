@@ -69,18 +69,26 @@ namespace persist_net_backend.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var createdFactura = await _facturaService.CreateFacturaAsync(new Factura
+            try
             {
-                EstanciaId = factura.EstanciaId,
-                ClienteId = factura.ClienteId,
-                Descuento = factura.Descuento ?? 0.0m,
-                Total = factura.Total,
-                FechaEmision = factura.FechaEmision ?? DateTime.Now,
-                Pagada = factura.Pagada,
-                LastModifiedBy = "system",
-                LastModifiedAt = DateTime.Now
-            });
-            return CreatedAtAction(nameof(GetFactura), new { id = createdFactura.Id }, MapToResponse(createdFactura));
+                var createdFactura = await _facturaService.CreateFacturaAsync(new Factura
+                {
+                    EstanciaId = factura.EstanciaId,
+                    ClienteId = factura.ClienteId,
+                    Descuento = factura.Descuento ?? 0.0m,
+                    Total = factura.Total,
+                    FechaEmision = factura.FechaEmision ?? DateTime.Now,
+                    Pagada = factura.Pagada,
+                    LastModifiedBy = "system",
+                    LastModifiedAt = DateTime.Now
+                });
+
+                return CreatedAtAction(nameof(GetFactura), new { id = createdFactura.Id }, MapToResponse(createdFactura));
+            }
+            catch (EntityReferenceValidationException ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
         }
 
         [HttpPut("{id}")]

@@ -6,10 +6,12 @@ namespace persist_net_backend.Services
     public class PagoService : IPagoService
     {
         private readonly IPagoRepository _pagoRepository;
+        private readonly IEntityReferenceValidator _entityReferenceValidator;
 
-        public PagoService(IPagoRepository pagoRepository)
+        public PagoService(IPagoRepository pagoRepository, IEntityReferenceValidator entityReferenceValidator)
         {
             _pagoRepository = pagoRepository;
+            _entityReferenceValidator = entityReferenceValidator;
         }
 
         public async Task<Pago?> GetPagoByIdAsync(int id)
@@ -29,6 +31,9 @@ namespace persist_net_backend.Services
 
         public async Task<Pago> CreatePagoAsync(Pago pago)
         {
+            await _entityReferenceValidator.EnsureExistsAsync<Factura>(pago.FacturaId, "Factura");
+            await _entityReferenceValidator.EnsureExistsAsync<MetodoPago>(pago.MetodoPagoId, "Metodo de pago");
+
             return await _pagoRepository.AddAsync(pago);
         }
 

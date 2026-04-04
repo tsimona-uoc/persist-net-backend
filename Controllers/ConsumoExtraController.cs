@@ -73,18 +73,25 @@ namespace persist_net_backend.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var createdConsumoExtra = await _consumoExtraService.CreateConsumoExtraAsync(new ConsumoExtra
+            try
             {
-                EstanciaId = consumoExtra.EstanciaId,
-                ServicioExtraId = consumoExtra.ServicioExtraId,
-                Cantidad = consumoExtra.Cantidad,
-                PrecioUnitario = consumoExtra.PrecioUnitario,
-                Fecha = consumoExtra.Fecha,
-                LastModifiedBy = "system",
-                LastModifiedAt = DateTime.Now
-            });
+                var createdConsumoExtra = await _consumoExtraService.CreateConsumoExtraAsync(new ConsumoExtra
+                {
+                    EstanciaId = consumoExtra.EstanciaId,
+                    ServicioExtraId = consumoExtra.ServicioExtraId,
+                    Cantidad = consumoExtra.Cantidad,
+                    PrecioUnitario = consumoExtra.PrecioUnitario,
+                    Fecha = consumoExtra.Fecha,
+                    LastModifiedBy = "system",
+                    LastModifiedAt = DateTime.Now
+                });
 
-            return CreatedAtAction(nameof(GetConsumoExtra), new { id = createdConsumoExtra.Id }, MapToResponse(createdConsumoExtra));
+                return CreatedAtAction(nameof(GetConsumoExtra), new { id = createdConsumoExtra.Id }, MapToResponse(createdConsumoExtra));
+            }
+            catch (EntityReferenceValidationException ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
         }
 
         [HttpPut("{id}")]

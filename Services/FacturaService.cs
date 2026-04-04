@@ -6,10 +6,12 @@ namespace persist_net_backend.Services
     public class FacturaService : IFacturaService
     {
         private readonly IFacturaRepository _facturaRepository;
+        private readonly IEntityReferenceValidator _entityReferenceValidator;
 
-        public FacturaService(IFacturaRepository facturaRepository)
+        public FacturaService(IFacturaRepository facturaRepository, IEntityReferenceValidator entityReferenceValidator)
         {
             _facturaRepository = facturaRepository;
+            _entityReferenceValidator = entityReferenceValidator;
         }
 
         public async Task<Factura?> GetFacturaByIdAsync(int id)
@@ -34,6 +36,9 @@ namespace persist_net_backend.Services
 
         public async Task<Factura> CreateFacturaAsync(Factura factura)
         {
+            await _entityReferenceValidator.EnsureExistsAsync<Estancia>(factura.EstanciaId, "Estancia");
+            await _entityReferenceValidator.EnsureExistsAsync<Cliente>(factura.ClienteId, "Cliente");
+
             return await _facturaRepository.AddAsync(factura);
         }
 

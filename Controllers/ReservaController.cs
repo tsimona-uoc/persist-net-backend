@@ -95,18 +95,26 @@ namespace persist_net_backend.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var createdReserva = await _reservaService.CreateReservaAsync(new Reserva
+            try
             {
-                ClienteId = reserva.ClienteId,
-                HabitacionId = reserva.HabitacionId,
-                FechaEntrada = reserva.FechaEntrada,
-                FechaSalida = reserva.FechaSalida,
-                RegimenId = reserva.RegimenId,
-                EstadoReservaId = reserva.EstadoReservaId,
-                LastModifiedBy = "system",
-                LastModifiedAt = DateTime.Now
-            });
-            return CreatedAtAction(nameof(GetReserva), new { id = createdReserva.Id }, MapToResponse(createdReserva));
+                var createdReserva = await _reservaService.CreateReservaAsync(new Reserva
+                {
+                    ClienteId = reserva.ClienteId,
+                    HabitacionId = reserva.HabitacionId,
+                    FechaEntrada = reserva.FechaEntrada,
+                    FechaSalida = reserva.FechaSalida,
+                    RegimenId = reserva.RegimenId,
+                    EstadoReservaId = reserva.EstadoReservaId,
+                    LastModifiedBy = "system",
+                    LastModifiedAt = DateTime.Now
+                });
+
+                return CreatedAtAction(nameof(GetReserva), new { id = createdReserva.Id }, MapToResponse(createdReserva));
+            }
+            catch (EntityReferenceValidationException ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
         }
 
         [HttpPut("{id}")]

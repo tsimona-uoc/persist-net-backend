@@ -63,14 +63,22 @@ namespace persist_net_backend.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var createdTarifa = await _tarifaService.CreateTarifaAsync(new Tarifa
+            try
             {
-                TemporadaId = tarifa.TemporadaId,
-                PrecioNoche = tarifa.PrecioNoche,
-                LastModifiedBy = "system",
-                LastModifiedAt = DateTime.Now
-            });
-            return CreatedAtAction(nameof(GetTarifa), new { id = createdTarifa.Id }, MapToResponse(createdTarifa));
+                var createdTarifa = await _tarifaService.CreateTarifaAsync(new Tarifa
+                {
+                    TemporadaId = tarifa.TemporadaId,
+                    PrecioNoche = tarifa.PrecioNoche,
+                    LastModifiedBy = "system",
+                    LastModifiedAt = DateTime.Now
+                });
+
+                return CreatedAtAction(nameof(GetTarifa), new { id = createdTarifa.Id }, MapToResponse(createdTarifa));
+            }
+            catch (EntityReferenceValidationException ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
         }
 
         [HttpPut("{id}")]

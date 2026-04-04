@@ -6,10 +6,12 @@ namespace persist_net_backend.Services
     public class HabitacionService : IHabitacionService
     {
         private readonly IHabitacionRepository _habitacionRepository;
+        private readonly IEntityReferenceValidator _entityReferenceValidator;
 
-        public HabitacionService(IHabitacionRepository habitacionRepository)
+        public HabitacionService(IHabitacionRepository habitacionRepository, IEntityReferenceValidator entityReferenceValidator)
         {
             _habitacionRepository = habitacionRepository;
+            _entityReferenceValidator = entityReferenceValidator;
         }
 
         public async Task<Habitacion?> GetHabitacionByIdAsync(int id)
@@ -29,6 +31,10 @@ namespace persist_net_backend.Services
 
         public async Task<Habitacion> CreateHabitacionAsync(Habitacion habitacion)
         {
+            await _entityReferenceValidator.EnsureExistsAsync<Hotel>(habitacion.HotelId, "Hotel");
+            await _entityReferenceValidator.EnsureExistsAsync<TipoHabitacion>(habitacion.TipoHabitacionId, "Tipo de habitacion");
+            await _entityReferenceValidator.EnsureExistsAsync<EstadoHabitacion>(habitacion.EstadoHabitacionId, "Estado de habitacion");
+
             return await _habitacionRepository.AddAsync(habitacion);
         }
 

@@ -8,6 +8,8 @@ using persist_net_backend.Services;
 using DotNetEnv;
 
 public class Program {
+    private const string FrontendCorsPolicy = "FrontendCorsPolicy";
+
     public static void Main(string[] args)
     {
         // Cargar variables de entorno desde .env
@@ -21,6 +23,7 @@ public class Program {
         Program.RegisterRepositories(builder);
         Program.RegisterServices(builder);
         Program.RegisterAuthentication(builder);
+        Program.RegisterCors(builder);
         Program.RegisterControllers(builder);
 
         #endregion
@@ -85,6 +88,7 @@ public class Program {
         // Authentication Services
         builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
         builder.Services.AddScoped<IAuthService, AuthService>();
+        builder.Services.AddScoped<IEntityReferenceValidator, EntityReferenceValidator>();
 
         // Hotel Services
         builder.Services.AddScoped<IHotelService, HotelService>();
@@ -159,6 +163,21 @@ public class Program {
         builder.Services.AddAuthorization();
     }
 
+    public static void RegisterCors(WebApplicationBuilder builder)
+    {
+        builder.Services.AddCors(options =>
+        {
+            options.AddPolicy(FrontendCorsPolicy, policy =>
+            {
+                policy
+                    .WithOrigins("http://localhost:5173")
+                    .AllowCredentials()
+                    .AllowAnyHeader()
+                    .AllowAnyMethod();
+            });
+        });
+    }
+
     public static void RegisterControllers(WebApplicationBuilder builder)
     {
         builder.Services.AddControllers();
@@ -177,6 +196,7 @@ public class Program {
     public static void Run(WebApplication app)
     {
         app.UseHttpsRedirection();
+        app.UseCors(FrontendCorsPolicy);
         app.UseAuthentication();
         app.UseAuthorization();
         
