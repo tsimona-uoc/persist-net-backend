@@ -28,6 +28,9 @@ namespace persist_net_backend.Controllers
                 Documentacion = cliente.Documentacion,
                 Telefono = cliente.Telefono,
                 Email = cliente.Email,
+                Ciudad = cliente.Ciudad,
+                Direccion = cliente.Direccion,
+                Vip = cliente.Vip,
                 FechaRegistro = cliente.FechaRegistro
             };
         }
@@ -62,6 +65,9 @@ namespace persist_net_backend.Controllers
                 Documentacion = cliente.Documentacion,
                 Telefono = cliente.Telefono,
                 Email = cliente.Email,
+                Ciudad = cliente.Ciudad ?? string.Empty,
+                Direccion = cliente.Direccion ?? string.Empty,
+                Vip = cliente.Vip,
                 LastModifiedBy = "system",
                 LastModifiedAt = DateTime.Now
             });
@@ -84,6 +90,9 @@ namespace persist_net_backend.Controllers
             existingCliente.Documentacion = cliente.Documentacion ?? existingCliente.Documentacion;
             existingCliente.Telefono = cliente.Telefono ?? existingCliente.Telefono;
             existingCliente.Email = cliente.Email ?? existingCliente.Email;
+            existingCliente.Ciudad = cliente.Ciudad ?? existingCliente.Ciudad;
+            existingCliente.Direccion = cliente.Direccion ?? existingCliente.Direccion;
+            existingCliente.Vip = cliente.Vip ?? existingCliente.Vip;
             existingCliente.LastModifiedBy = "system";
             existingCliente.LastModifiedAt = DateTime.Now;
 

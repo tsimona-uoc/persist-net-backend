@@ -22,5 +22,13 @@ namespace persist_net_backend.DTOs.Cliente
         [Required(ErrorMessage = "El email es obligatorio.")]
         [EmailAddress(ErrorMessage = "El email no es válido.")]
         public required string Email { get; set; }
+
+        [StringLength(255, ErrorMessage = "La ciudad no puede exceder los 255 caracteres.")]
+        public string? Ciudad { get; set; }
+
+        [StringLength(500, ErrorMessage = "La dirección no puede exceder los 500 caracteres.")]
+        public string? Direccion { get; set; }
+
+        public bool Vip { get; set; } = false;
     }
 }

@@ -24,6 +24,14 @@ namespace persist_net_backend.Models
         [StringLength(255)]
         public string Email { get; set; } = string.Empty;
 
+        [StringLength(255)]
+        public string Ciudad { get; set; } = string.Empty;
+
+        [StringLength(500)]
+        public string Direccion { get; set; } = string.Empty;
+
+        public bool Vip { get; set; } = false;
+
         [Required]
         public DateTime FechaRegistro { get; set; } = DateTime.Now;
 
