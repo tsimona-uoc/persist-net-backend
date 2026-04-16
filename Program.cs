@@ -170,7 +170,10 @@ public class Program {
             options.AddPolicy(FrontendCorsPolicy, policy =>
             {
                 policy
-                    .WithOrigins("http://localhost:5173")
+                    .WithOrigins(
+                        "http://localhost:5173",
+                        "https://persistnetweb.azurewebsites.net"
+                    )
                     .AllowCredentials()
                     .AllowAnyHeader()
                     .AllowAnyMethod();
