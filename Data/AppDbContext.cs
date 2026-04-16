@@ -32,6 +32,7 @@ namespace persist_net_backend.Data
         public DbSet<Pago> Pagos { get; set; } = null!;
         public DbSet<MetodoPago> MetodosPago { get; set; } = null!;
         public DbSet<Regimen> Regimenes { get; set; } = null!;
+        public DbSet<FacturaLinea> FacturaLineas { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

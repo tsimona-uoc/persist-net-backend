@@ -41,5 +41,7 @@ namespace persist_net_backend.Models
         public virtual Estancia? Estancia { get; set; }
         public virtual Cliente? Cliente { get; set; }
         public virtual ICollection<Pago> Pagos { get; set; } = new List<Pago>();
+        public virtual ICollection<FacturaLinea> Lineas { get; set; } = new List<FacturaLinea>();
+
     }
 }
