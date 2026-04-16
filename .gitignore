@@ -41,3 +41,6 @@ Migrations/
 
 # Ignore appsettings files (do not commit secrets)
 appsettings.json
+
+# Ignore build files
+publish/
