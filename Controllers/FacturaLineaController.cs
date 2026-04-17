@@ -56,7 +56,6 @@ namespace persist_net_backend.Controllers
             _context.FacturaLineas.Add(facturaLinea);
             await _context.SaveChangesAsync();
 
-            // Actualizamos el total de la factura principal
             await UpdateFacturaTotal(facturaLinea.FacturaId);
 
             return CreatedAtAction(nameof(GetFacturaLinea), new { id = facturaLinea.Id }, facturaLinea);
@@ -126,7 +125,6 @@ namespace persist_net_backend.Controllers
                     .SumAsync(l => l.Monto);
                 
                 _context.Entry(factura).State = EntityState.Modified;
-                // Guardamos los cambios en la factura
                 await _context.SaveChangesAsync();
             }
         }
