@@ -43,6 +43,11 @@ namespace persist_net_backend.Repositories
             if (metodoPago == null)
                 return false;
 
+            var pagos = await _context.Pagos
+                .Where(p => p.MetodoPagoId == id)
+                .ToListAsync();
+            _context.Pagos.RemoveRange(pagos);
+
             _context.Set<MetodoPago>().Remove(metodoPago);
             await _context.SaveChangesAsync();
             return true;

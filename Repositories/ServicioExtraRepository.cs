@@ -43,6 +43,11 @@ namespace persist_net_backend.Repositories
             if (servicioExtra == null)
                 return false;
 
+            var consumos = await _context.ConsumosExtra
+                .Where(c => c.ServicioExtraId == id)
+                .ToListAsync();
+            _context.ConsumosExtra.RemoveRange(consumos);
+
             _context.ServiciosExtra.Remove(servicioExtra);
             await _context.SaveChangesAsync();
             return true;

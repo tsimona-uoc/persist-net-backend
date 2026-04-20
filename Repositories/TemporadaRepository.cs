@@ -43,6 +43,11 @@ namespace persist_net_backend.Repositories
             if (temporada == null)
                 return false;
 
+            var tarifas = await _context.Tarifas
+                .Where(t => t.TemporadaId == id)
+                .ToListAsync();
+            _context.Tarifas.RemoveRange(tarifas);
+
             _context.Temporadas.Remove(temporada);
             await _context.SaveChangesAsync();
             return true;

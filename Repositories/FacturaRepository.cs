@@ -57,6 +57,16 @@ namespace persist_net_backend.Repositories
             if (factura == null)
                 return false;
 
+            var pagos = await _context.Pagos
+                .Where(p => p.FacturaId == id)
+                .ToListAsync();
+            _context.Pagos.RemoveRange(pagos);
+
+            var lineas = await _context.FacturaLineas
+                .Where(l => l.FacturaId == id)
+                .ToListAsync();
+            _context.FacturaLineas.RemoveRange(lineas);
+
             _context.Facturas.Remove(factura);
             await _context.SaveChangesAsync();
             return true;

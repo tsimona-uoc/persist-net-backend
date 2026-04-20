@@ -59,6 +59,12 @@ namespace persist_net_backend.Data
                 .HasForeignKey(h => h.TipoHabitacionId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            modelBuilder.Entity<Habitacion>()
+                .HasOne(h => h.EstadoHabitacion)
+                .WithMany(e => e.Habitaciones)
+                .HasForeignKey(h => h.EstadoHabitacionId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             modelBuilder.Entity<Tarifa>()
                 .HasOne(t => t.Temporada)
                 .WithMany(te => te.Tarifas)
@@ -77,10 +83,28 @@ namespace persist_net_backend.Data
                 .HasForeignKey(r => r.HabitacionId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            modelBuilder.Entity<Reserva>()
+                .HasOne(r => r.EstadoReserva)
+                .WithMany(e => e.Reservas)
+                .HasForeignKey(r => r.EstadoReservaId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Reserva>()
+                .HasOne(r => r.Regimen)
+                .WithMany()
+                .HasForeignKey(r => r.RegimenId)
+                .OnDelete(DeleteBehavior.Cascade);
+
             modelBuilder.Entity<Estancia>()
                 .HasOne(e => e.Reserva)
                 .WithMany(r => r.Estancias)
                 .HasForeignKey(e => e.ReservaId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Estancia>()
+                .HasOne(e => e.EstadoEstancia)
+                .WithMany(e => e.Estancias)
+                .HasForeignKey(e => e.EstadoEstanciaId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Factura>()
@@ -111,12 +135,18 @@ namespace persist_net_backend.Data
                 .HasOne(c => c.ServicioExtra)
                 .WithMany(s => s.ConsumosExtra)
                 .HasForeignKey(c => c.ServicioExtraId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Pago>()
                 .HasOne(p => p.Factura)
                 .WithMany(f => f.Pagos)
                 .HasForeignKey(p => p.FacturaId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Pago>()
+                .HasOne(p => p.MetodoPago)
+                .WithMany(m => m.Pagos)
+                .HasForeignKey(p => p.MetodoPagoId)
                 .OnDelete(DeleteBehavior.Cascade);
         }
     }
