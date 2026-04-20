@@ -165,15 +165,45 @@ public class Program {
 
     public static void RegisterCors(WebApplicationBuilder builder)
     {
+        var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? Array.Empty<string>();
+        var normalizedOrigins = allowedOrigins
+            .Where(origin => !string.IsNullOrWhiteSpace(origin))
+            .Select(origin => origin.Trim().TrimEnd('/'))
+            .ToArray();
+
+        if (normalizedOrigins.Length == 0)
+        {
+            normalizedOrigins = ["https://persistnetweb.azurewebsites.net"];
+        }
+
         builder.Services.AddCors(options =>
         {
             options.AddPolicy(FrontendCorsPolicy, policy =>
             {
+                if (builder.Environment.IsDevelopment())
+                {
+                    policy.SetIsOriginAllowed(origin =>
+                    {
+                        if (string.IsNullOrWhiteSpace(origin))
+                        {
+                            return false;
+                        }
+
+                        if (Uri.TryCreate(origin, UriKind.Absolute, out var uri) && uri.IsLoopback)
+                        {
+                            return true;
+                        }
+
+                        var normalizedOrigin = origin.Trim().TrimEnd('/');
+                        return normalizedOrigins.Contains(normalizedOrigin, StringComparer.OrdinalIgnoreCase);
+                    });
+                }
+                else
+                {
+                    policy.WithOrigins(normalizedOrigins);
+                }
+
                 policy
-                    .WithOrigins(
-                        "http://localhost:5173",
-                        "https://persistnetweb.azurewebsites.net"
-                    )
                     .AllowCredentials()
                     .AllowAnyHeader()
                     .AllowAnyMethod();
@@ -199,6 +229,7 @@ public class Program {
     public static void Run(WebApplication app)
     {
         app.UseHttpsRedirection();
+        app.UseRouting();
         app.UseCors(FrontendCorsPolicy);
         app.UseAuthentication();
         app.UseAuthorization();

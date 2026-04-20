@@ -87,13 +87,19 @@ namespace persist_net_backend.Data
                 .HasOne(f => f.Estancia)
                 .WithMany(e => e.Facturas)
                 .HasForeignKey(f => f.EstanciaId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Factura>()
                 .HasOne(f => f.Cliente)
                 .WithMany(c => c.Facturas)
                 .HasForeignKey(f => f.ClienteId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<FacturaLinea>()
+                .HasOne(l => l.Factura)
+                .WithMany(f => f.Lineas)
+                .HasForeignKey(l => l.FacturaId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<ConsumoExtra>()
                 .HasOne(c => c.Estancia)
