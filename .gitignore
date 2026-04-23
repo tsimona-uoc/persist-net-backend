@@ -1,46 +1,25 @@
 # Environment
 .env
 
-# User secrets
-**/secrets.json
-
 # VS Code
 .vscode/
-*.code-workspace
 
-# Build results
-[Dd]ebug/
-[Dd]ebugPublic/
-[Rr]elease/
-[Rr]eleases/
-x64/
-x86/
-[Ww][Ii][Nn]32/
-[Aa][Rr][Mm]/
-[Aa][Rr][Mm]64/
-bld/
-[Bb]in/
-[Oo]bj/
-[Ll]og/
-[Ll]ogs/
+# Build
+bin/
+obj/
 
-# Visual Studio cache/options
-.vs/
+# Logs
+*.log
 
-# NuGet
-*.nupkg
-*.snupkg
-packages/
-.nuget/
+# Export files
+*.xml
+data_export.json
+export_odoo_*.xml
 
-# Entity Framework
-Migrations/
+# Temp files
+*.bak
+*.txt
 
-# User-specific files
-*.rsuser
-
-# Ignore appsettings files (do not commit secrets)
-appsettings.json
-
-# Ignore build files
-publish/
+# Config
+appsettings.Development.json
+appsettings.*.json
