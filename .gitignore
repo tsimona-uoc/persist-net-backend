@@ -44,3 +44,5 @@ appsettings.json
 
 # Ignore build files
 publish/
+data_export.json
+export_odoo_20260423_220944.xml

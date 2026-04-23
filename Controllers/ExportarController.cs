@@ -1,12 +1,14 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using persist_net_backend.Services;
+using System.Diagnostics;
+using System.Text;
 
 namespace persist_net_backend.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
+    //[Authorize]
     public class ExportarController : ControllerBase
     {
         private readonly IExportService _exportService;
@@ -19,17 +21,68 @@ namespace persist_net_backend.Controllers
         /// <summary>
         /// Exporta todos los datos de la base de datos en formato XML
         /// </summary>
-        /// <returns>Archivo XML con todos los datos</returns>
         [HttpGet("xml")]
         public async Task<IActionResult> ExportarXml()
         {
             try
             {
                 var xmlContent = await _exportService.ExportAllToXmlAsync();
-                var bytes = System.Text.Encoding.UTF8.GetBytes(xmlContent);
-                
-                return File(bytes, "application/xml", 
+                var bytes = Encoding.UTF8.GetBytes(xmlContent);
+
+                return File(bytes, "application/xml",
                     $"export_{DateTime.Now:yyyyMMdd_HHmmss}.xml");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Exporta datos a Odoo usando Python
+        /// </summary>
+        [HttpPost("odoo")]
+        public async Task<IActionResult> ExportarAOdoo()
+        {
+            try
+            {
+                // 1. Obtener datos en JSON desde tu servicio existente
+                var jsonContent = await _exportService.ExportAllToJsonAsync();
+
+                // 2. Guardar JSON en archivo temporal
+                var filePath = Path.Combine(Directory.GetCurrentDirectory(), "data_export.json");
+                await System.IO.File.WriteAllTextAsync(filePath, jsonContent);
+
+                // 3. Configurar proceso Python
+                var process = new Process();
+                process.StartInfo.FileName = "python";
+
+                process.StartInfo.Arguments = "odoo_integration/generar_xml.py";
+
+                process.StartInfo.RedirectStandardOutput = true;
+                process.StartInfo.RedirectStandardError = true;
+                process.StartInfo.UseShellExecute = false;
+                process.StartInfo.CreateNoWindow = true;
+
+                // 4. Ejecutar Python
+                process.Start();
+
+                string output = await process.StandardOutput.ReadToEndAsync();
+                string error = await process.StandardError.ReadToEndAsync();
+
+                process.WaitForExit();
+
+                // 5. Control de errores
+                if (!string.IsNullOrEmpty(error))
+                {
+                    return BadRequest(new { error = error });
+                }
+
+                return Ok(new
+                {
+                    mensaje = "Exportación a Odoo realizada correctamente",
+                    detalle = output
+                });
             }
             catch (Exception ex)
             {
@@ -40,17 +93,15 @@ namespace persist_net_backend.Controllers
         /// <summary>
         /// Exporta los datos de una tabla específica en formato XML
         /// </summary>
-        /// <param name="tableName">Nombre de la tabla a exportar</param>
-        /// <returns>Archivo XML con datos de la tabla</returns>
         [HttpGet("xml/{tableName}")]
         public async Task<IActionResult> ExportarTablaXml(string tableName)
         {
             try
             {
                 var xmlContent = await _exportService.ExportTableToXmlAsync(tableName);
-                var bytes = System.Text.Encoding.UTF8.GetBytes(xmlContent);
-                
-                return File(bytes, "application/xml", 
+                var bytes = Encoding.UTF8.GetBytes(xmlContent);
+
+                return File(bytes, "application/xml",
                     $"export_{tableName}_{DateTime.Now:yyyyMMdd_HHmmss}.xml");
             }
             catch (Exception ex)
@@ -60,18 +111,17 @@ namespace persist_net_backend.Controllers
         }
 
         /// <summary>
-        /// Exporta todos los datos de la base de datos en formato JSON
+        /// Exporta todos los datos en formato JSON
         /// </summary>
-        /// <returns>Archivo JSON con todos los datos</returns>
         [HttpGet("json")]
         public async Task<IActionResult> ExportarJson()
         {
             try
             {
                 var jsonContent = await _exportService.ExportAllToJsonAsync();
-                var bytes = System.Text.Encoding.UTF8.GetBytes(jsonContent);
-                
-                return File(bytes, "application/json", 
+                var bytes = Encoding.UTF8.GetBytes(jsonContent);
+
+                return File(bytes, "application/json",
                     $"export_{DateTime.Now:yyyyMMdd_HHmmss}.json");
             }
             catch (Exception ex)
@@ -81,9 +131,8 @@ namespace persist_net_backend.Controllers
         }
 
         /// <summary>
-        /// Retorna el XML formateado en la respuesta (no descargable)
+        /// Preview XML
         /// </summary>
-        /// <returns>XML como contenido de la respuesta</returns>
         [HttpGet("preview/xml")]
         public async Task<IActionResult> PreviewXml()
         {
@@ -99,9 +148,8 @@ namespace persist_net_backend.Controllers
         }
 
         /// <summary>
-        /// Retorna el JSON formateado en la respuesta (no descargable)
+        /// Preview JSON
         /// </summary>
-        /// <returns>JSON como contenido de la respuesta</returns>
         [HttpGet("preview/json")]
         public async Task<IActionResult> PreviewJson()
         {
