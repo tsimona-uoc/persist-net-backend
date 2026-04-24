@@ -62,8 +62,7 @@ namespace persist_net_backend.Controllers
 
                 // 3. Configurar proceso Python
                 var process = new Process();
-                process.StartInfo.FileName = "python";
-                process.StartInfo.WorkingDirectory = Directory.GetCurrentDirectory();
+                process.StartInfo.FileName = "/home/python/bin/python3";
 
                 // 4. Pasamos los parámetros al script de python
                 process.StartInfo.Arguments = $"odoo_integration/generar_xml.py \"{request.NombreLote}\"";
@@ -87,35 +86,23 @@ namespace persist_net_backend.Controllers
                     return BadRequest(new { error = error });
                 }
 
-                // 7. Buscar directamente el archivo XML más reciente en el disco duro
-                string xmlContent = null;
-                string fileName = "export_odoo.xml";
-                
-                // Extraer el nombre exacto de la salida de Python
-                var match = System.Text.RegularExpressions.Regex.Match(output, @"(export_odoo_[A-Za-z0-9_\-\.]+\.xml)");
-                if (match.Success)
+                // 7. Extraer nombre del archivo del output del script
+                // El script imprime: "Éxito: {nombre_archivo}"
+                string fileName = "";
+                if (output.Contains("Éxito:"))
                 {
-                    fileName = match.Groups[1].Value.Trim();
-                }
-                
-                // Buscar el archivo XML más reciente usando LastWriteTime (Compatible con Windows y Linux/Azure)
-                var files = Directory.GetFiles(Directory.GetCurrentDirectory(), "export_odoo_*.xml", SearchOption.TopDirectoryOnly)
-                                     .OrderByDescending(f => System.IO.File.GetLastWriteTime(f))
-                                     .ToList();
-                                     
-                if (files.Any())
-                {
-                    var latestFile = files.First();
-                    xmlContent = await System.IO.File.ReadAllTextAsync(latestFile);
-                    fileName = Path.GetFileName(latestFile);
+                    var parts = output.Split("Éxito:");
+                    if (parts.Length > 1)
+                    {
+                        fileName = parts[1].Trim().Replace("\n", "").Replace("\r", "");
+                    }
                 }
 
                 return Ok(new
                 {
                     mensaje = "Exportación a Odoo realizada correctamente",
-                    detalle = output,
-                    xmlData = xmlContent,
-                    fileName = fileName
+                    nombreArchivo = fileName,
+                    detalle = output
                 });
             }
             catch (Exception ex)
@@ -191,6 +178,62 @@ namespace persist_net_backend.Controllers
             {
                 var jsonContent = await _exportService.ExportAllToJsonAsync();
                 return Content(jsonContent, "application/json");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Descarga un archivo de Odoo XML desde la carpeta export
+        /// Solo permite descargar archivos que contengan "odoo" y ".xml" en el nombre
+        /// </summary>
+        [HttpGet("download-odoo/{fileName}")]
+        public IActionResult DescargarArchivoOdoo(string fileName)
+        {
+            try
+            {
+                // Validar que el nombre de archivo no sea vacío
+                if (string.IsNullOrWhiteSpace(fileName))
+                {
+                    return BadRequest(new { error = "El nombre del archivo no puede estar vacío" });
+                }
+
+                // Validar que contenga "odoo" y ".xml"
+                if (!fileName.Contains("odoo", StringComparison.OrdinalIgnoreCase) || !fileName.EndsWith(".xml", StringComparison.OrdinalIgnoreCase))
+                {
+                    return BadRequest(new { error = "El archivo debe contener 'odoo' en el nombre y tener extensión .xml" });
+                }
+
+                // Validar que no contenga caracteres peligrosos de ruta
+                if (fileName.Contains("..") || fileName.Contains("/") || fileName.Contains("\\"))
+                {
+                    return BadRequest(new { error = "Nombre de archivo inválido" });
+                }
+
+                // Construir ruta segura dentro de la carpeta export
+                var baseDir = Path.Combine(Directory.GetCurrentDirectory(), "export");
+                var filePath = Path.Combine(baseDir, fileName);
+
+                // Verificar que el archivo está dentro de la carpeta export (evitar directory traversal)
+                var fullPath = Path.GetFullPath(filePath);
+                var fullBaseDir = Path.GetFullPath(baseDir);
+
+                if (!fullPath.StartsWith(fullBaseDir, StringComparison.OrdinalIgnoreCase))
+                {
+                    return BadRequest(new { error = "Acceso denegado. El archivo no está en la carpeta permitida" });
+                }
+
+                // Verificar que el archivo existe
+                if (!System.IO.File.Exists(fullPath))
+                {
+                    return NotFound(new { error = "El archivo no existe" });
+                }
+
+                // Descargar el archivo
+                var bytes = System.IO.File.ReadAllBytes(fullPath);
+                return File(bytes, "application/xml", fileName);
             }
             catch (Exception ex)
             {
