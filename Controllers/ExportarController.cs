@@ -86,9 +86,22 @@ namespace persist_net_backend.Controllers
                     return BadRequest(new { error = error });
                 }
 
+                // 7. Extraer nombre del archivo del output del script
+                // El script imprime: "Éxito: {nombre_archivo}"
+                string fileName = "";
+                if (output.Contains("Éxito:"))
+                {
+                    var parts = output.Split("Éxito:");
+                    if (parts.Length > 1)
+                    {
+                        fileName = parts[1].Trim().Replace("\n", "").Replace("\r", "");
+                    }
+                }
+
                 return Ok(new
                 {
                     mensaje = "Exportación a Odoo realizada correctamente",
+                    nombreArchivo = fileName,
                     detalle = output
                 });
             }

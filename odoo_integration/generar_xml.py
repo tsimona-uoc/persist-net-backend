@@ -67,7 +67,7 @@ def generar_xml(clientes, reservas, facturas, nombre_lote="Lote"):
     ruta_salida = os.path.join(carpeta_export, nombre_archivo)
     tree.write(ruta_salida, encoding="utf-8", xml_declaration=True)
 
-    print(f"XML generado correctamente: {ruta_salida}")
+    print(f"Éxito: {nombre_archivo}")
 
 
 if __name__ == "__main__":
