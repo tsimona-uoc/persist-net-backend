@@ -20,19 +20,13 @@ export_odoo_*.xml
 *.bak
 *.txt
 
-<<<<<<< HEAD
-# User-specific files
-*.rsuser
-
-# Ignore appsettings files (do not commit secrets)
-appsettings.json
-
-# Ignore build files
-publish/
-data_export.json
-export_odoo_20260423_220944.xml
-=======
 # Config
 appsettings.Development.json
 appsettings.*.json
->>>>>>> 9869ea459e23e50fc151ab4602f148cac5c25457
+
+# Migrations
+Migrations/
+
+publish/
+
+appsettings.json
