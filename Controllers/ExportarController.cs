@@ -62,7 +62,8 @@ namespace persist_net_backend.Controllers
 
                 // 3. Configurar proceso Python
                 var process = new Process();
-                process.StartInfo.FileName = "/home/python/bin/python3";
+                process.StartInfo.FileName = "python";
+                process.StartInfo.WorkingDirectory = Directory.GetCurrentDirectory();
 
                 // 4. Pasamos los parámetros al script de python
                 process.StartInfo.Arguments = $"odoo_integration/generar_xml.py \"{request.NombreLote}\"";
@@ -86,10 +87,35 @@ namespace persist_net_backend.Controllers
                     return BadRequest(new { error = error });
                 }
 
+                // 7. Buscar directamente el archivo XML más reciente en el disco duro
+                string xmlContent = null;
+                string fileName = "export_odoo.xml";
+                
+                // Extraer el nombre exacto de la salida de Python
+                var match = System.Text.RegularExpressions.Regex.Match(output, @"(export_odoo_[A-Za-z0-9_\-\.]+\.xml)");
+                if (match.Success)
+                {
+                    fileName = match.Groups[1].Value.Trim();
+                }
+                
+                // Buscar el archivo XML más reciente usando LastWriteTime (Compatible con Windows y Linux/Azure)
+                var files = Directory.GetFiles(Directory.GetCurrentDirectory(), "export_odoo_*.xml", SearchOption.TopDirectoryOnly)
+                                     .OrderByDescending(f => System.IO.File.GetLastWriteTime(f))
+                                     .ToList();
+                                     
+                if (files.Any())
+                {
+                    var latestFile = files.First();
+                    xmlContent = await System.IO.File.ReadAllTextAsync(latestFile);
+                    fileName = Path.GetFileName(latestFile);
+                }
+
                 return Ok(new
                 {
                     mensaje = "Exportación a Odoo realizada correctamente",
-                    detalle = output
+                    detalle = output,
+                    xmlData = xmlContent,
+                    fileName = fileName
                 });
             }
             catch (Exception ex)
