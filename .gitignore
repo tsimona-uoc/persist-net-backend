@@ -26,7 +26,6 @@ appsettings.*.json
 
 # Migrations
 Migrations/
-
+Migrations/*
 publish/
-
 appsettings.json
