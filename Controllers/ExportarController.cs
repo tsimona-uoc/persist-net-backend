@@ -62,7 +62,7 @@ namespace persist_net_backend.Controllers
 
                 // 3. Configurar proceso Python
                 var process = new Process();
-                process.StartInfo.FileName = "python";
+                process.StartInfo.FileName = "/home/python/bin/python3";
 
                 // 4. Pasamos los parámetros al script de python
                 process.StartInfo.Arguments = $"odoo_integration/generar_xml.py \"{request.NombreLote}\"";
