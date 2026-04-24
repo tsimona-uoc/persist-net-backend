@@ -60,7 +60,11 @@ def generar_xml(clientes, reservas, facturas, nombre_lote="Lote"):
     # Indentación básica (Pretty Print) para que sea legible
     ET.indent(tree, space="    ", level=0)
 
-    ruta_salida = os.path.join(os.getcwd(), nombre_archivo)
+    # Crear carpeta export si no existe
+    carpeta_export = os.path.join(os.getcwd(), "export")
+    os.makedirs(carpeta_export, exist_ok=True)
+
+    ruta_salida = os.path.join(carpeta_export, nombre_archivo)
     tree.write(ruta_salida, encoding="utf-8", xml_declaration=True)
 
     print(f"XML generado correctamente: {ruta_salida}")

@@ -171,5 +171,61 @@ namespace persist_net_backend.Controllers
                 return BadRequest(new { error = ex.Message });
             }
         }
+
+        /// <summary>
+        /// Descarga un archivo de Odoo XML desde la carpeta export
+        /// Solo permite descargar archivos que contengan "odoo" y ".xml" en el nombre
+        /// </summary>
+        [HttpGet("download-odoo/{fileName}")]
+        public IActionResult DescargarArchivoOdoo(string fileName)
+        {
+            try
+            {
+                // Validar que el nombre de archivo no sea vacío
+                if (string.IsNullOrWhiteSpace(fileName))
+                {
+                    return BadRequest(new { error = "El nombre del archivo no puede estar vacío" });
+                }
+
+                // Validar que contenga "odoo" y ".xml"
+                if (!fileName.Contains("odoo", StringComparison.OrdinalIgnoreCase) || !fileName.EndsWith(".xml", StringComparison.OrdinalIgnoreCase))
+                {
+                    return BadRequest(new { error = "El archivo debe contener 'odoo' en el nombre y tener extensión .xml" });
+                }
+
+                // Validar que no contenga caracteres peligrosos de ruta
+                if (fileName.Contains("..") || fileName.Contains("/") || fileName.Contains("\\"))
+                {
+                    return BadRequest(new { error = "Nombre de archivo inválido" });
+                }
+
+                // Construir ruta segura dentro de la carpeta export
+                var baseDir = Path.Combine(Directory.GetCurrentDirectory(), "export");
+                var filePath = Path.Combine(baseDir, fileName);
+
+                // Verificar que el archivo está dentro de la carpeta export (evitar directory traversal)
+                var fullPath = Path.GetFullPath(filePath);
+                var fullBaseDir = Path.GetFullPath(baseDir);
+
+                if (!fullPath.StartsWith(fullBaseDir, StringComparison.OrdinalIgnoreCase))
+                {
+                    return BadRequest(new { error = "Acceso denegado. El archivo no está en la carpeta permitida" });
+                }
+
+                // Verificar que el archivo existe
+                if (!System.IO.File.Exists(fullPath))
+                {
+                    return NotFound(new { error = "El archivo no existe" });
+                }
+
+                // Descargar el archivo
+                var bytes = System.IO.File.ReadAllBytes(fullPath);
+                return File(bytes, "application/xml", fileName);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
     }
 }
