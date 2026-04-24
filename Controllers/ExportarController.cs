@@ -6,6 +6,13 @@ using System.Text;
 
 namespace persist_net_backend.Controllers
 {
+    public class ExportarOdooRequest
+    {
+        public string NombreLote { get; set; } = "Lote_Default";
+        public DateTime? FechaInicio { get; set; }
+        public DateTime? FechaFin { get; set; }
+    }
+
     [ApiController]
     [Route("api/[controller]")]
     //[Authorize]
@@ -42,7 +49,7 @@ namespace persist_net_backend.Controllers
         /// Exporta datos a Odoo usando Python
         /// </summary>
         [HttpPost("odoo")]
-        public async Task<IActionResult> ExportarAOdoo()
+        public async Task<IActionResult> ExportarAOdoo([FromBody] ExportarOdooRequest request)
         {
             try
             {
@@ -57,14 +64,15 @@ namespace persist_net_backend.Controllers
                 var process = new Process();
                 process.StartInfo.FileName = "python";
 
-                process.StartInfo.Arguments = "odoo_integration/generar_xml.py";
+                // 4. Pasamos los parámetros al script de python
+                process.StartInfo.Arguments = $"odoo_integration/generar_xml.py \"{request.NombreLote}\"";
 
                 process.StartInfo.RedirectStandardOutput = true;
                 process.StartInfo.RedirectStandardError = true;
                 process.StartInfo.UseShellExecute = false;
                 process.StartInfo.CreateNoWindow = true;
 
-                // 4. Ejecutar Python
+                // 5. Ejecutar Python
                 process.Start();
 
                 string output = await process.StandardOutput.ReadToEndAsync();
@@ -72,7 +80,7 @@ namespace persist_net_backend.Controllers
 
                 process.WaitForExit();
 
-                // 5. Control de errores
+                // 6. Control de errores
                 if (!string.IsNullOrEmpty(error))
                 {
                     return BadRequest(new { error = error });
@@ -131,7 +139,7 @@ namespace persist_net_backend.Controllers
         }
 
         /// <summary>
-        /// Preview XML
+        /// Vista previa de la exportación en XML
         /// </summary>
         [HttpGet("preview/xml")]
         public async Task<IActionResult> PreviewXml()
@@ -148,7 +156,7 @@ namespace persist_net_backend.Controllers
         }
 
         /// <summary>
-        /// Preview JSON
+        /// Vista previa de la exportación en JSON
         /// </summary>
         [HttpGet("preview/json")]
         public async Task<IActionResult> PreviewJson()
