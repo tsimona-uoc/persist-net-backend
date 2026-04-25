@@ -16,42 +16,49 @@ def cargar_datos():
         return json.load(f)
 
 
-def generar_xml(clientes, reservas, facturas, nombre_lote="Lote", nombre_archivo=None):
+def generar_xml(clientes, reservas, facturas, estancias, nombre_lote="Lote", nombre_archivo=None):
     # Formato estándar de Odoo
     root = ET.Element("odoo")
     data_el = ET.SubElement(root, "data", noupdate="1")
 
-    # clientes 
+    # clientes
     for c in clientes:
-        record_id = f"hotel_cliente_{c.get('id', '')}"
+        record_id = f"hotel_cliente_{c.get('Id', '')}"
         record_el = ET.SubElement(data_el, "record", id=record_id, model="res.partner")
 
-        ET.SubElement(record_el, "field", name="name").text = str(c.get("nombre", ""))
-        ET.SubElement(record_el, "field", name="vat").text = str(c.get("documento", ""))
-        ET.SubElement(record_el, "field", name="phone").text = str(c.get("telefono", ""))
+        nombre = str(c.get("Nombre", ""))
+        apellido = str(c.get("Apellido", ""))
+        nombre_completo = (nombre + " " + apellido).strip()
+        ET.SubElement(record_el, "field", name="name").text = nombre_completo
+        ET.SubElement(record_el, "field", name="vat").text = str(c.get("Documentacion", ""))
+        ET.SubElement(record_el, "field", name="phone").text = str(c.get("Telefono", ""))
         # Puedes añadir un campo 'ref' para guardar el ID de tu sistema
-        ET.SubElement(record_el, "field", name="ref").text = f"{nombre_lote}_ID{c.get('id', '')}"
+        ET.SubElement(record_el, "field", name="ref").text = f"{nombre_lote}_ID{c.get('Id', '')}"
 
-    # reservas 
+    # reservas
     for r in reservas:
-        record_id = f"hotel_reserva_{r.get('id', '')}"
+        record_id = f"hotel_reserva_{r.get('Id', '')}"
         record_el = ET.SubElement(data_el, "record", id=record_id, model="hotel.reserva")
         
         # Usamos 'ref' para enlazar la reserva con el ID del cliente creado arriba
-        ET.SubElement(record_el, "field", name="cliente_id", ref=f"hotel_cliente_{r.get('clienteId', '')}")
-        ET.SubElement(record_el, "field", name="fecha_entrada").text = str(r.get("fechaEntrada", ""))
-        ET.SubElement(record_el, "field", name="fecha_salida").text = str(r.get("fechaSalida", ""))
-        ET.SubElement(record_el, "field", name="habitacion").text = str(r.get("habitacion", ""))
-        ET.SubElement(record_el, "field", name="estado").text = str(r.get("estado", ""))
+        ET.SubElement(record_el, "field", name="cliente_id", ref=f"hotel_cliente_{r.get('ClienteId', '')}")
+        ET.SubElement(record_el, "field", name="fecha_entrada").text = str(r.get("FechaEntrada", ""))
+        ET.SubElement(record_el, "field", name="fecha_salida").text = str(r.get("FechaSalida", ""))
+        ET.SubElement(record_el, "field", name="habitacion").text = str(r.get("HabitacionId", ""))
+        ET.SubElement(record_el, "field", name="estado").text = str(r.get("EstadoReservaId", ""))
 
-    # facturas 
+    estancia_a_reserva = {e.get("Id"): e.get("ReservaId") for e in estancias}
+
+    # facturas
     for f in facturas:
-        record_id = f"hotel_factura_{f.get('id', '')}"
+        record_id = f"hotel_factura_{f.get('Id', '')}"
         record_el = ET.SubElement(data_el, "record", id=record_id, model="hotel.factura")
-        
-        ET.SubElement(record_el, "field", name="reserva_id", ref=f"hotel_reserva_{f.get('reservaId', '')}")
-        ET.SubElement(record_el, "field", name="total").text = str(f.get("total", ""))
-        ET.SubElement(record_el, "field", name="fecha").text = str(f.get("fecha", ""))
+
+        reserva_id = estancia_a_reserva.get(f.get("EstanciaId"))
+        if reserva_id is not None:
+            ET.SubElement(record_el, "field", name="reserva_id", ref=f"hotel_reserva_{reserva_id}")
+        ET.SubElement(record_el, "field", name="total").text = str(f.get("Total", ""))
+        ET.SubElement(record_el, "field", name="fecha").text = str(f.get("FechaEmision", ""))
 
     # guardar XML
     if not nombre_archivo:
@@ -77,12 +84,14 @@ if __name__ == "__main__":
         nombre_archivo = sys.argv[2] if len(sys.argv) > 2 else None
         
         data = cargar_datos()
+        tables = data.get("Data", data)
 
-        clientes = data.get("clientes", [])
-        reservas = data.get("reservas", [])
-        facturas = data.get("facturas", [])
+        clientes = tables.get("Clientes", [])
+        reservas = tables.get("Reservas", [])
+        estancias = tables.get("Estancias", [])
+        facturas = tables.get("Facturas", [])
 
-        generar_xml(clientes, reservas, facturas, nombre_lote, nombre_archivo)
+        generar_xml(clientes, reservas, facturas, estancias, nombre_lote, nombre_archivo)
 
     except Exception as e:
         print(f"ERROR: {str(e)}")
