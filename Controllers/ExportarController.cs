@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using persist_net_backend.Services;
 using System.Diagnostics;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace persist_net_backend.Controllers
 {
@@ -60,12 +61,14 @@ namespace persist_net_backend.Controllers
                 var filePath = Path.Combine(Directory.GetCurrentDirectory(), "data_export.json");
                 await System.IO.File.WriteAllTextAsync(filePath, jsonContent);
 
+                var generatedFileName = $"odoo_{DateTime.Now:yyyyMMdd_HHmmss}.xml";
+
                 // 3. Configurar proceso Python
                 var process = new Process();
                 process.StartInfo.FileName = "/home/python/bin/python3";
 
                 // 4. Pasamos los parámetros al script de python
-                process.StartInfo.Arguments = $"odoo_integration/generar_xml.py \"{request.NombreLote}\"";
+                process.StartInfo.Arguments = $"odoo_integration/generar_xml.py \"{request.NombreLote}\" \"{generatedFileName}\"";
 
                 process.StartInfo.RedirectStandardOutput = true;
                 process.StartInfo.RedirectStandardError = true;
@@ -88,13 +91,17 @@ namespace persist_net_backend.Controllers
 
                 // 7. Extraer nombre del archivo del output del script
                 // El script imprime: "Éxito: {nombre_archivo}"
-                string fileName = "";
+                string fileName = generatedFileName;
                 if (output.Contains("Éxito:"))
                 {
                     var parts = output.Split("Éxito:");
                     if (parts.Length > 1)
                     {
-                        fileName = parts[1].Trim().Replace("\n", "").Replace("\r", "");
+                        var parsedName = parts[1].Trim().Replace("\n", "").Replace("\r", "");
+                        if (!string.IsNullOrWhiteSpace(parsedName))
+                        {
+                            fileName = parsedName;
+                        }
                     }
                 }
 
@@ -200,10 +207,11 @@ namespace persist_net_backend.Controllers
                     return BadRequest(new { error = "El nombre del archivo no puede estar vacío" });
                 }
 
-                // Validar que contenga "odoo" y ".xml"
-                if (!fileName.Contains("odoo", StringComparison.OrdinalIgnoreCase) || !fileName.EndsWith(".xml", StringComparison.OrdinalIgnoreCase))
+                // Validar formato odoo_YYYYMMDD_HHMMSS.xml
+                var isValidName = Regex.IsMatch(fileName, "^odoo_\\d{8}_\\d{6}\\.xml$", RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
+                if (!isValidName)
                 {
-                    return BadRequest(new { error = "El archivo debe contener 'odoo' en el nombre y tener extensión .xml" });
+                    return BadRequest(new { error = "El archivo debe tener el formato odoo_YYYYMMDD_HHMMSS.xml" });
                 }
 
                 // Validar que no contenga caracteres peligrosos de ruta

@@ -16,7 +16,7 @@ def cargar_datos():
         return json.load(f)
 
 
-def generar_xml(clientes, reservas, facturas, nombre_lote="Lote"):
+def generar_xml(clientes, reservas, facturas, nombre_lote="Lote", nombre_archivo=None):
     # Formato estándar de Odoo
     root = ET.Element("odoo")
     data_el = ET.SubElement(root, "data", noupdate="1")
@@ -54,7 +54,8 @@ def generar_xml(clientes, reservas, facturas, nombre_lote="Lote"):
         ET.SubElement(record_el, "field", name="fecha").text = str(f.get("fecha", ""))
 
     # guardar XML
-    nombre_archivo = f"export_odoo_{nombre_lote}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xml"
+    if not nombre_archivo:
+        nombre_archivo = f"odoo_{datetime.now().strftime('%Y%m%d_%H%M%S')}.xml"
     tree = ET.ElementTree(root)
     
     # Indentación básica (Pretty Print) para que sea legible
@@ -73,6 +74,7 @@ def generar_xml(clientes, reservas, facturas, nombre_lote="Lote"):
 if __name__ == "__main__":
     try:
         nombre_lote = sys.argv[1] if len(sys.argv) > 1 else "LoteManual"
+        nombre_archivo = sys.argv[2] if len(sys.argv) > 2 else None
         
         data = cargar_datos()
 
@@ -80,7 +82,7 @@ if __name__ == "__main__":
         reservas = data.get("reservas", [])
         facturas = data.get("facturas", [])
 
-        generar_xml(clientes, reservas, facturas, nombre_lote)
+        generar_xml(clientes, reservas, facturas, nombre_lote, nombre_archivo)
 
     except Exception as e:
         print(f"ERROR: {str(e)}")
