@@ -10,14 +10,14 @@ namespace persist_net_backend.Services
     public class JwtTokenService : IJwtTokenService
     {
         private readonly IUserSessionRepository _userSessionRepository;
-        private readonly IUserRepository _userRepository;
+        private readonly Repositories.IUserRepository _userRepository;
         private readonly IConfiguration _configuration;
         private readonly string _secretKey;
         private readonly string _issuer;
         private readonly string _audience;
         private readonly int _expirationMinutes;
 
-        public JwtTokenService(IUserSessionRepository userSessionRepository, IUserRepository userRepository, IConfiguration configuration)
+        public JwtTokenService(IUserSessionRepository userSessionRepository, Repositories.IUserRepository userRepository, IConfiguration configuration)
         {
             _userSessionRepository = userSessionRepository;
             _userRepository = userRepository;

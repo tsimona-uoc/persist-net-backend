@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using persist_net_backend.Services;
+using ClosedXML.Excel;
+using persist_net_backend.Models;
 
 namespace persist_net_backend.Controllers
 {
@@ -9,44 +11,73 @@ namespace persist_net_backend.Controllers
     [Authorize]
     public class ImportarController : ControllerBase
     {
+        private readonly IAuthService _authService;
         private readonly IImportService _importService;
 
-        public ImportarController(IImportService importService)
+        public ImportarController(IImportService importService, IAuthService authService)
         {
             _importService = importService;
+            _authService = authService;
         }
 
         /// <summary>
-        /// Importa datos desde un archivo XML
+        /// Importa correos electrónicos desde un archivo Excel (.xlsx)
         /// </summary>
-        /// <param name="file">Archivo XML a importar</param>
-        /// <returns>Resultado de la importación con estadísticas</returns>
-        [HttpPost("xml")]
-        public async Task<IActionResult> ImportarXml(IFormFile file)
+        /// <param name="file">Archivo Excel a importar</param>
+        /// <returns>Lista de emails obtenidos</returns>
+        [HttpPost("xlsx")]
+        public async Task<IActionResult> ImportarExcel(IFormFile file)
         {
             try
             {
+                // 1. Validaciones básicas
                 if (file == null || file.Length == 0)
                     return BadRequest(new { error = "El archivo no puede estar vacío" });
 
-                using (var reader = new StreamReader(file.OpenReadStream()))
+                if (!Path.GetExtension(file.FileName).Equals(".xlsx", StringComparison.OrdinalIgnoreCase))
+                    return BadRequest(new { error = "El formato debe ser .xlsx (Excel)" });
+
+                var emails = new List<string>();
+
+                // 2. Procesar el archivo con ClosedXML
+                using (var stream = file.OpenReadStream())
                 {
-                    var xmlContent = await reader.ReadToEndAsync();
+                    using (var workbook = new XLWorkbook(stream))
+                    {
+                        // Obtenemos la primera hoja de trabajo
+                        var worksheet = workbook.Worksheet(1);
 
-                    // Validación para interceptar errores antes de pasarlo al servicio
-                    new System.Xml.XmlDocument().LoadXml(xmlContent);
+                        // Suponiendo que los emails están en la columna A, a partir de la fila 2 (saltando cabecera)
+                        var rows = worksheet.RangeUsed().RowsUsed().Skip(1);
 
-                    var result = await _importService.ImportFromXmlAsync(xmlContent);
-                    return Ok(result);
+                        foreach (var row in rows)
+                        {
+                            // Obtenemos el valor de la primera celda de la fila
+                            var fullName = row.Cell(11).GetValue<string>().Trim();
+                            var email = row.Cell(13).GetValue<string>().Trim();
+
+
+                            if (!string.IsNullOrWhiteSpace(email))
+                            {
+                                string name = fullName.Contains(' ') ? fullName.Split(' ')[0] : fullName;
+                                string surname = fullName.Contains(' ') ? fullName.Split(' ')[1] : string.Empty;
+                                await this._authService.RegisterAsync(name, surname, email, email, "RECEPCIONISTA");
+                            }
+                        }
+                    }
                 }
-            }
-            catch (System.Xml.XmlException xmlEx)
-            {
-                return BadRequest(new { error = "Error de formato en el documento XML: " + xmlEx.Message });
+
+                // 3. Retornar los datos obtenidos (o procesarlos con tu servicio)
+                return Ok(new
+                {
+                    totalRegistros = emails.Count,
+                    data = emails
+                });
             }
             catch (Exception ex)
             {
-                return BadRequest(new { error = ex.Message });
+                // Capturamos errores específicos de formato o lectura
+                return BadRequest(new { error = "Error al procesar el Excel: " + ex.Message });
             }
         }
 
@@ -63,7 +94,7 @@ namespace persist_net_backend.Controllers
                 using (var reader = new StreamReader(Request.Body))
                 {
                     var xmlContent = await reader.ReadToEndAsync();
-                    
+
                     if (string.IsNullOrEmpty(xmlContent))
                         return BadRequest(new { error = "El contenido XML no puede estar vacío" });
 
@@ -118,7 +149,5 @@ namespace persist_net_backend.Controllers
                 return BadRequest(new { error = ex.Message });
             }
         }
-
-
     }
 }

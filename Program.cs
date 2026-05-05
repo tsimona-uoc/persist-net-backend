@@ -39,7 +39,7 @@ public class Program {
 
         builder.Services.AddScoped<IUserRoleRepository, UserRoleRepository>();
         builder.Services.AddScoped<IUserSessionRepository, UserSessionRepository>();
-        builder.Services.AddScoped<IUserRepository, UserRepository>();
+        builder.Services.AddScoped<persist_net_backend.Repositories.IUserRepository, UserRepository>();
 
         builder.Services.AddScoped<IHotelRepository, HotelRepository>();
         builder.Services.AddScoped<IClienteRepository, ClienteRepository>();
@@ -69,7 +69,7 @@ public class Program {
     public static void RegisterServices(WebApplicationBuilder builder)
     {
         builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
-        builder.Services.AddScoped<IAuthService, AuthService>();
+        builder.Services.AddScoped<persist_net_backend.Services.IAuthService, AuthService>();
         builder.Services.AddScoped<IEntityReferenceValidator, EntityReferenceValidator>();
 
         builder.Services.AddScoped<IHotelService, HotelService>();

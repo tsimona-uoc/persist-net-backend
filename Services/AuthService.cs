@@ -8,10 +8,10 @@ namespace persist_net_backend.Services
     public class AuthService : IAuthService
     {
         private readonly IUserRoleRepository _userRoleRepository;
-        private readonly IUserRepository _userRepository;
+        private readonly Repositories.IUserRepository _userRepository;
         private readonly IJwtTokenService _jwtTokenService;
 
-        public AuthService(IUserRepository userRepository, IUserRoleRepository userRoleRepository, IJwtTokenService jwtTokenService)
+        public AuthService(Repositories.IUserRepository userRepository, IUserRoleRepository userRoleRepository, IJwtTokenService jwtTokenService)
         {
             this._userRepository = userRepository;
             this._userRoleRepository = userRoleRepository;
